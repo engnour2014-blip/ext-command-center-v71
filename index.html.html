@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EXT Command Center V7.1 — Decision Platform (Threshold Fix)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#f4f1ec;--c1:#faf8f5;--c2:#efece7;--c3:#e2dfd9;--bd:#d8d4cc;--bd2:#c5c0b6;
+--t1:#2c2416;--t2:#5a5040;--t3:#8a7f6e;--t4:#b5ae9f;
+--ac:#1a73a7;--ac2:#145e88;--gn:#1a8a5c;--yl:#c47f0a;--rd:#c43322;--og:#b8621a;--pp:#7c3aed;--cy:#0e9aa7;
+--gnBg:#e8f5e0;--ylBg:#fdf3e0;--rdBg:#fce5e2;--acBg:#e8f0fa;--ppBg:#f0e8ff;
+}
+html[data-theme="dark"]{
+--bg:#12141a;--c1:#1a1d26;--c2:#22252f;--c3:#2c3040;--bd:#333750;--bd2:#444966;
+--t1:#e8e8f0;--t2:#a0a8c0;--t3:#6878a0;--t4:#4a5578;
+--gnBg:rgba(26,138,92,.12);--ylBg:rgba(196,127,10,.12);--rdBg:rgba(196,51,34,.12);--acBg:rgba(26,115,167,.12);--ppBg:rgba(124,58,237,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t2);overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+canvas{max-width:100%!important;max-height:100%!important}.mono{font-family:'JetBrains Mono',monospace}.hide{display:none!important}
+header{background:var(--c1);border-bottom:2px solid var(--bd);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-ic{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff}
+.logo .s1{font-size:8px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.logo .s2{font-size:15px;font-weight:800;color:var(--t1);letter-spacing:-.4px}
+.hdr-r{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.chip{font-size:9px;padding:4px 8px;border-radius:5px;background:var(--c2);border:1px solid var(--bd);color:var(--t2);font-weight:600}.chip b{color:var(--ac)}
+.abtn{padding:4px 10px;border-radius:5px;border:1px solid var(--ac);background:var(--c1);color:var(--ac);font-size:9px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.abtn:hover{background:var(--ac);color:#fff}.abtn-f{background:var(--ac);color:#fff}
+.exec-banner{background:linear-gradient(90deg,#f0ebe3,#fff);border-bottom:2px solid var(--bd);padding:8px 18px;font-size:12px;font-weight:500;color:var(--t2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+html[data-theme="dark"] .exec-banner{background:linear-gradient(90deg,var(--c1),var(--c2))}
+.tag{padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.3px}
+.tag-gn{background:var(--gnBg);color:var(--gn);border:1px solid rgba(26,138,92,.2)}
+.tag-yl{background:var(--ylBg);color:var(--yl);border:1px solid rgba(196,127,10,.2)}
+.tag-rd{background:var(--rdBg);color:var(--rd);border:1px solid rgba(196,51,34,.2)}
+/* NAV with groups */
+.nav-wrap{background:var(--c1);border-bottom:2px solid var(--bd);position:sticky;top:58px;z-index:99;display:flex;overflow-x:auto}
+.nav-grp{display:flex;border-right:1px solid var(--bd)}
+.nav-grp:last-child{border-right:none}
+.nav-grp-lbl{writing-mode:vertical-lr;text-orientation:mixed;font-size:7px;font-weight:700;color:var(--t4);letter-spacing:1px;text-transform:uppercase;padding:6px 3px;background:var(--c2);display:flex;align-items:center;justify-content:center}
+.tab{padding:9px 13px;font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .12s}
+.tab:hover{color:var(--t1);background:var(--c2)}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac);background:#f0ebe3}
+html[data-theme="dark"] .tab.on{background:var(--acBg)}
+.pnl{padding:14px 18px;overflow-x:visible;overflow-y:visible;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:8px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g6{grid-template-columns:repeat(6,1fr)}.g23{grid-template-columns:2fr 3fr}.g32{grid-template-columns:3fr 2fr}.g13{grid-template-columns:1fr 3fr}
+@media(max-width:1100px){.g3,.g4,.g5,.g6{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.g2,.g3,.g4,.g5,.g6,.g23,.g32,.g13{grid-template-columns:1fr}}
+.cd{background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:12px;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.03)}.cd:hover{border-color:var(--bd2)}
+.cd.gl-g{border-left:3px solid var(--gn)}.cd.gl-r{border-left:3px solid var(--rd)}.cd.gl-y{border-left:3px solid var(--yl)}.cd.gl-b{border-left:3px solid var(--ac)}
+.sec{display:flex;align-items:center;gap:7px;margin:14px 0 7px}.sec h2{font-size:13px;font-weight:700;color:var(--t1)}.sec .tg{font-size:7px;padding:2px 7px;border-radius:4px;background:var(--c2);color:var(--t3);border:1px solid var(--bd)}
+.lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}.tbl th{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);background:var(--c2);font-weight:700}.tbl td{font-size:10px;padding:6px 8px;border-bottom:1px solid var(--c3);color:var(--t1)}.tbl tr:hover td{background:rgba(0,0,0,.02)}
+.rb{display:inline-block;padding:2px 6px;border-radius:3px;font-size:7px;font-weight:700}
+.rb-l{background:var(--gnBg);color:var(--gn)}.rb-m{background:var(--ylBg);color:var(--yl)}.rb-h{background:var(--rdBg);color:var(--rd)}
+.filters{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.fb{padding:4px 9px;border-radius:5px;cursor:pointer;font-size:9px;font-weight:600;background:var(--c1);color:var(--t3);border:1px solid var(--bd);transition:all .1s}
+.fb:hover{color:var(--t1)}.fb.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+input.si{padding:4px 8px;border-radius:5px;font-size:9px;background:var(--c1);color:var(--t1);border:1px solid var(--bd);outline:none;font-family:'JetBrains Mono',monospace;width:80px}
+input[type="range"]{accent-color:var(--ac)}
+.vg{display:flex;flex-wrap:wrap;gap:4px}
+.vt{position:relative;width:72px;height:36px;border-radius:5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px solid;transition:all .12s}
+.vt:hover{transform:scale(1.15);z-index:20;box-shadow:0 4px 12px rgba(0,0,0,.1)}.vt.d{background:var(--gnBg);border-color:var(--gn)}.vt.w{background:var(--ylBg);border-color:var(--yl)}.vt.n{background:var(--rdBg);border-color:#e8a8a0}
+.vi{font-size:9px;font-weight:700;color:var(--t1);font-family:'JetBrains Mono',monospace}
+.tp{display:none;position:absolute;bottom:calc(100% + 4px);background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;min-width:220px;max-width:260px;z-index:100;box-shadow:0 8px 28px rgba(0,0,0,.15);pointer-events:none}
+.vt:hover .tp{display:block}
+.tp-c{left:50%;transform:translateX(-50%)}
+.tp-l{left:0;transform:none}
+.tp-r{right:0;left:auto;transform:none}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:18px;max-width:400px;width:92%;box-shadow:0 12px 36px rgba(0,0,0,.12)}
+.cat-group{border-radius:7px;margin-bottom:5px;overflow:hidden;border:1px solid var(--bd)}
+.cat-header{padding:5px 10px;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px}
+.cat-row{display:flex;align-items:center;gap:7px;padding:5px 10px;border-bottom:1px solid var(--c3);background:var(--c1)}.cat-row:last-child{border:none}
+/* HERO KPI */
+.hero-kpi{background:linear-gradient(135deg,var(--c1),var(--c2));border:2px solid var(--bd);border-radius:12px;padding:16px 20px;text-align:center;position:relative;overflow:hidden}
+.hero-kpi::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:var(--ac);opacity:.04}
+.hero-kpi .hero-val{font-size:48px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1}
+.hero-kpi .hero-sub{font-size:11px;color:var(--t3);margin-top:4px}
+/* KPI CARD */
+.kpi{text-align:center;padding:10px 6px}
+.kpi .val{font-size:26px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1}
+.kpi .sub{font-size:9px;color:var(--t3);margin-top:3px}
+/* INSIGHT */
+.insight{padding:8px 12px;border-radius:7px;border:1px solid var(--bd);margin-bottom:5px;display:flex;gap:8px;align-items:flex-start}
+.insight-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+/* ACTION-FIRST BOX */
+.action-box{background:linear-gradient(135deg,#1a73a7,#145e88);border-radius:10px;padding:14px 18px;color:#fff;margin-bottom:10px}
+.action-box h3{font-size:13px;font-weight:800;margin-bottom:6px}
+.action-box .act-item{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:11px}
+.action-box .act-item:last-child{border:none}
+.action-box .act-num{width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+/* SPC */
+.spc-card{border-radius:8px;padding:10px 12px;background:var(--c1);border:1px solid var(--bd)}
+/* SCENARIO LIBRARY */
+.scn-btn{padding:6px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--c1);cursor:pointer;font-size:10px;color:var(--t1);font-weight:600;transition:all .12s;font-family:inherit}
+.scn-btn:hover{border-color:var(--ac);color:var(--ac)}
+.scn-btn.active{background:var(--acBg);border-color:var(--ac);color:var(--ac)}
+/* CONSTRAINT */
+.cform input,.cform select,.cform textarea{width:100%;padding:5px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:10px;margin-bottom:5px;outline:none}
+.cform label{font-size:8px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:2px}
+/* DARK TOGGLE */
+.theme-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--bd);background:var(--c2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.theme-btn:hover{border-color:var(--ac)}
+/* GRADIENT INTENSITY HELPER */
+.gi{border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<header>
+<div class="logo"><div class="logo-ic">E</div><div><div class="s1">MGC External Works • Laheq Program</div><div class="s2">Command Center <span style="font-size:9px;color:var(--pp);font-weight:500">V7.1</span></div></div></div>
+<div class="hdr-r">
+<div class="chip">📅 <b id="dtC">29 Mar 2026</b></div>
+<div class="chip">🏠 <b id="vlC">162</b> Villas</div>
+<div class="chip">🎯 Target: <b>14 Jul 2026</b></div>
+<button class="abtn" onclick="showUpload()">📂 Upload</button>
+<button class="abtn" onclick="saveSnap()">💾 Save</button>
+<button class="abtn" onclick="addConstraintUI()">🔗 Constraint</button>
+<button class="theme-btn" onclick="toggleTheme()" title="Toggle Dark/Light">🌓</button>
+</div>
+</header>
+<div class="exec-banner" id="execBanner"></div>
+<div class="nav-wrap" id="nb"></div>
+<div id="pns"></div>
+<div class="modal-bg hide" id="uM"><div class="modal"><h3 style="font-size:13px;color:var(--t1);margin-bottom:5px">📂 Upload Excel</h3><p style="font-size:8px;color:var(--t3);margin-bottom:8px">Drop <b>Master Construction Tracker</b> (.xlsx). Reads "Daily Progress".</p><div id="dz" onclick="document.getElementById('fi').click()" style="border:2px dashed var(--bd2);border-radius:7px;padding:16px;text-align:center;cursor:pointer"><div style="font-size:20px">📁</div><div style="font-size:8px;color:var(--t3);margin-top:2px">Click or drop file</div></div><input type="file" id="fi" accept=".xlsx" style="display:none" onchange="handleFile(this.files[0])"><div id="valLog" style="display:none;margin-top:6px;max-height:80px;overflow-y:auto;padding:4px;background:var(--bg);border-radius:5px;border:1px solid var(--bd);font-size:8px"></div><div style="text-align:right;margin-top:5px"><button class="abtn" onclick="hideUpload()">Cancel</button></div></div></div>
+<div class="modal-bg hide" id="cM"><div class="modal"><h3 style="font-size:13px;color:var(--t1);margin-bottom:6px">🔗 Add Constraint</h3><div class="cform"><label>Villa/Zone</label><input id="c_villa" placeholder="e.g. M3308, Zone M2"><label>Package</label><select id="c_pkg"><option value="ALL">All</option><option>Water Tank</option><option>Pump Room</option><option>Pool</option><option>Utility MH</option><option>Utility Pipes</option><option>Handover</option></select><label>Type</label><select id="c_type"><option>Access</option><option>Material</option><option>Inspection</option><option>Design</option><option>Manpower</option><option>Predecessor</option><option>Client</option></select><label>Description</label><textarea id="c_desc" rows="2"></textarea><label>Owner</label><input id="c_own"><label>Impact (days)</label><input id="c_impact" type="number" value="7" min="0"><label>Due Date</label><input id="c_due" type="date"></div><div style="display:flex;gap:5px;justify-content:flex-end;margin-top:6px"><button class="abtn" onclick="hideConstraint()">Cancel</button><button class="abtn abtn-f" onclick="saveConstraint()">Save</button></div></div></div>
+<div class="modal-bg hide" id="ppcM"><div class="modal"><h3 style="font-size:13px;color:var(--t1);margin-bottom:6px">📋 Weekly PPC Plan</h3><p style="font-size:8px;color:var(--t3);margin-bottom:8px">How many villas do you plan to complete this week per package?</p><div id="ppcForm"></div><div style="display:flex;gap:5px;justify-content:flex-end;margin-top:6px"><button class="abtn" onclick="hidePPC()">Cancel</button><button class="abtn abtn-f" onclick="savePPCPlan()">Save Plan</button></div></div></div>
+<script>
+// ============================================================
+// V6 CONFIG & DATA
+// ============================================================
+const RAW=`M3301|M3|1111111111111111119
+M3302|M3|1111111111111111119
+M3303|M3|1111111111111111119
+M3304|M3|1111111111111111119
+M3305|M3|1111111111111111119
+M3306|M3|1111111111111111119
+M3307|M3|1111111111111111119
+M3308|M1|1111011110111111110
+M3309|M1|1111111110111111110
+M3310|M1|1111111111111111110
+M3311|M1|1111111111111111110
+M3312|M1|1111011110111111110
+M3313|M1|1111111110111111110
+M3314|M2|1111011110111000000
+M3315|M2|1111011110111000000
+M3401|M3|1111111111111111119
+M3402|M3|1111111111111111119
+M3403|M3|1111111111111111119
+M3404|M3|1111111111111111119
+M3405|M3|1111111111111111119
+M3406|M3|1111111111111111119
+M3407|M1|1111111111111111110
+M3408|M1|1111111111111111110
+M3409|M1|1111111110111111110
+M3410|M1|1111011110111111110
+M3411|M1|1111011110111111110
+M3412|M1|1111011110111111110
+M3413|M1|1111011110111111110
+M3414|M1|1111011110111111110
+M3415|M1|1111011110111111110
+M3416|M1|1111011110111111110
+M3417|M2|1111011110111000000
+M3418|M2|1111011110111000000
+M3419|M2|1111011110111000000
+M3420|M2|1111011110111000000
+M3421|M2|1111011110111000000
+M3422|M2|1111011110111000000
+M3423|M2|1115011110111000000
+M3424|M2|1111011110111000000
+M3801|M3|1111111111111111110
+M3802|M3|1111111111111111119
+M3803|M3|1111111111111111119
+M3804|M3|1111111111111111119
+M3805|M3|1111111111111111119
+M3806|M3|1111111111111111119
+M3807|M3|1111111111111111119
+M3808|M3|1111111111111111119
+M3809|M3|1111111111111111119
+M3810|M1|1111011110111111110
+M3811|M1|1111011110111111110
+M3812|M1|1111011110111111110
+M3813|M1|1111011110111111100
+M3814|M2|0000000000000000000
+M3815|M2|0000000000000000000
+M3816|M2|1111011110111000000
+M3817|M2|0000000000000000000
+M3818|M2|0000011000110000000
+M3819|M2|1111011110111000000
+M3820|M2|1115011150111000000
+M3821|M2|1111011150111000000
+M3822|M2|1111011110111000000
+M3823|M2|1111011110111000000
+M3824|M2|1111011110111000000
+M4801|M3|1111111110111111119
+M4802|M3|1111111111111111119
+M4803|M3|1111111111111111119
+M4804|M3|1111111110111111119
+M4805|M3|1111111111111111110
+M4806|M3|1111111111111111110
+M4807|M3|1111111111111111110
+M4808|M3|1111111111111111110
+M4809|M3|1111111111111111110
+M4810|M1|1111011110111111110
+M4811|M1|1111111111111111110
+M4812|M1|1111111111111111110
+M4813|M1|1111111110111111110
+M4814|M1|1111111110111111110
+M4815|M1|1111111111111111110
+M4816|M1|0000000000000000000
+M4817|M1|1111011110111111110
+M4818|M1|1111011110111111110
+M4819|M1|1111011110111111110
+M4820|M2|0000000000000000000
+M4821|M2|0000000000000000000
+M4822|M2|0000011000110000000
+M4823|M2|0000011000111000000
+M4824|M2|1111011110111000000
+M5201|M1|0000000000000000000
+M5202|M1|0000000000000111110
+M5203|M1|0000000000000111110
+M5204|M1|0000000000000111110
+M5205|M1|0000000000000111110
+M5206|M1|0000000000000111110
+M5207|M1|0000000000000111110
+M5208|M1|1111011110111111110
+M5209|M2|0000000000000000000
+M5210|M2|1111011110110000000
+G2701|G4|1111111111111111010
+G2702|G4|1111111111111111110
+G2703|G4|1111111111111111110
+G2704|G3|1111011110111000000
+G2705|G2|1111011110111000000
+G2706|G2|1111011110111000000
+G2801|G4|1111111111111111110
+G2802|G4|1111111111111111110
+G2803|G4|1111111111111111110
+G2804|G4|1111111111111111110
+G2805|G4|1111111111111111110
+G2806|G4|1111111111111111110
+G2807|G4|1111111111111111110
+G2808|G4|1111111111111111119
+G2901|G1|1111111111111111119
+G2902|G1|1111111111111111119
+G2903|G1|1111111111111111119
+G2904|G1|1111111111111111110
+G2905|G1|1111111111111111110
+G2906|G1|1111111111111111110
+G3201|G4|1111111111111111110
+G3202|G4|1111111111111111110
+G3203|G4|1111111111111111119
+G3204|G4|1111111111111111109
+G3205|G3|1111111111111000009
+G3206|G3|1111111111111000009
+G3207|G3|1111111111111000009
+G3208|G3|1111111111111000009
+G3209|G3|1111111111111000009
+G3210|G3|1111111111111000009
+G3211|G3|1111111111111000009
+G3212|G3|1111111111111000000
+G3213|G3|1111111111111000000
+G3214|G3|1111111111111000000
+G3215|G2|1111011110111000000
+G3216|G2|1111011110111000000
+G3217|G2|1111011110111000000
+G3218|G2|1111011110111000000
+G3219|G2|1111011110111000000
+G3220|G1|1111111111111111119
+G3221|G1|1111111111111111110
+G3222|G1|1111111111111111110
+G3223|G1|1111111111111111110
+G3224|G1|1111111111111111110
+G3225|G1|1111111111111111110
+G3226|G1|1111111111111111110
+G3227|G1|1111111111111111110
+G3801|G3|1111111111111000000
+G3802|G3|1111111111111000000
+G3803|G2|1111011110111000000
+G3804|G2|1111011110111000000
+G3805|G2|1111011110111000000
+G3806|G2|1111011110111000000
+G3807|G2|1111011110111000000
+G3808|G2|1111011110111000000
+G3809|G2|1111011110111000000
+G3901|G1|1111111111111111119
+G3902|G1|1111111111111111110
+G4801|G4|1111111111111111010
+G4802|G4|1111111111111111010
+G4803|G4|1111111111111111110
+G4804|G4|1111111111111111110
+G4805|G4|1111011110111000000
+G4806|G4|1111011110111000000
+G4807|G4|1111011110111000000`;
+
+const SCURVE_L=["Sep1","Sep2","Sep3","Sep4","Oct1","Oct2","Oct3","Oct4","Nov1","Nov2","Nov3","Nov4","Dec2","Jan1","Jan2","Jan3","Jan4","Feb1","Feb2","Feb3","Feb4","Mar1"];
+const SCURVE={"Pump Room":[8,26,34,37,44,51,57,69,79,86,86,95,106,109,113,116,120,125,125,130,136,139],"Water Tank":[15,26,34,37,44,51,57,69,79,86,86,95,106,109,113,116,120,125,125,130,135,139],"Pool":[0,2,7,3,10,20,20,25,30,30,40,50,65,109,113,116,120,125,125,130,136,138],"Utility MH":[0,0,0,0,0,0,0,2,5,35,42,46,56,68,83,87,90,97,97,97,101,102]};
+const WEEKLY_GAINS={"Pump Room":[8,18,8,3,7,7,6,12,10,7,0,9,11,3,4,3,4,5,0,5,6,3],"Water Tank":[15,11,8,3,7,7,6,12,10,7,0,9,11,3,4,3,4,5,0,5,5,4],"Pool":[0,2,5,0,7,10,0,5,5,0,10,10,15,44,4,3,4,5,0,5,6,2],"Utility MH":[0,0,0,0,0,0,0,2,3,30,7,4,10,12,15,4,3,10,0,0,4,1]};
+
+const ACTS=[
+{n:"Water Tank",su:["Excavation","PC","Footing","Wall","Slab"],ix:[0,1,2,3,4],ic:"💧",w:1.2},
+{n:"Pump Room",su:["Excavation","PC","Footing","Wall","Slab"],ix:[5,6,7,8,9],ic:"⚙️",w:1.2},
+{n:"Pool",su:["Excavation","PC","RC"],ix:[10,11,12],ic:"🏊",w:1.0},
+{n:"Utility MH",su:["Excavation","PC","RC"],ix:[13,14,15],ic:"🕳️",w:0.8},
+{n:"Utility Pipes",su:["Excavation","Install"],ix:[16,17],ic:"🔧",w:0.8},
+{n:"Handover",su:["Handover"],ix:[18],ic:"🏁",w:1.5}
+];
+const ALL_SUBS=[];ACTS.forEach(a=>a.su.forEach((s,i)=>ALL_SUBS.push({n:a.n+" "+s,cat:a.n,ai:a.ix[i],ic:a.ic})));
+const CN={M:"Middle",G:"Golf"};const CC={M:"#3b82f6",G:"#10b981"};
+const CAT_C={"Water Tank":"#2980b9","Pump Room":"#27ae60","Pool":"#e67e22","Utility MH":"#8e44ad","Utility Pipes":"#16a085","Handover":"#c0392b"};
+// FIX A: Dynamic dates — updated on every file upload
+const TARGET=new Date("2026-07-14");
+const EXT_START=new Date("2025-09-01");
+let TODAY=new Date("2026-03-29");
+let DLEFT=Math.ceil((TARGET-TODAY)/864e5);
+let WLEFT=Math.round(DLEFT/7);
+let WELAPSED=Math.round((TODAY-EXT_START)/864e5/7);
+// FIX D: Correct baseline = total villas / actual project span in weeks
+const PROJECT_WEEKS=Math.round((TARGET-EXT_START)/864e5/7); // ~45 weeks
+let BASELINE_RATE=162/PROJECT_WEEKS; // 3.6/wk (was incorrectly 5.4)
+const ZONES=[{c:"M",z:1,l:"Middle Z1"},{c:"M",z:2,l:"Middle Z2"},{c:"M",z:3,l:"Middle Z3"},{c:"G",z:1,l:"Golf Z1"},{c:"G",z:2,l:"Golf Z2"},{c:"G",z:3,l:"Golf Z3"},{c:"G",z:4,l:"Golf Z4"}];
+
+let D={v:[],date:"29 Mar 2026",_dateISO:"2026-03-29",snaps:[],hist:{daily:[],weekly:[]},constraints:[],ppc:[],fcAccuracy:[],audit:[]};
+let charts={},scnRates={},curTab="exec";
+ACTS.forEach(a=>scnRates[a.n]=0);
+
+// ============================================================
+// DATE GOVERNANCE LAYER (Batch A — Critical Stabilization)
+// ============================================================
+// RULE: new Date() is BANNED from any analytical/storage logic.
+// All date operations go through GOV.
+const GOV = {
+  _dataDate: new Date("2026-03-29T12:00:00"),
+  _isoDate: "2026-03-29",
+  
+  // Set the canonical data date — ONLY source of truth
+  setDataDate(isoStr) {
+    if (!isoStr || !/^\d{4}-\d{2}-\d{2}$/.test(isoStr)) {
+      console.warn("[GOV] Invalid ISO date rejected:", isoStr);
+      return false;
+    }
+    const d = new Date(isoStr + "T12:00:00");
+    if (isNaN(d.getTime())) {
+      console.warn("[GOV] Unparseable date rejected:", isoStr);
+      return false;
+    }
+    this._dataDate = d;
+    this._isoDate = isoStr;
+    return true;
+  },
+  
+  // Return the data date (NEVER browser date)
+  now() { return new Date(this._dataDate.getTime()); },
+  iso() { return this._isoDate; },
+  
+  // Safe date creation from ISO string
+  fromISO(isoStr) {
+    if (!isoStr) return null;
+    const d = new Date(isoStr + (isoStr.includes("T") ? "" : "T12:00:00"));
+    return isNaN(d.getTime()) ? null : d;
+  },
+  
+  // Days between two ISO date strings
+  daysBetween(iso1, iso2) {
+    const d1 = this.fromISO(iso1), d2 = this.fromISO(iso2);
+    if (!d1 || !d2) return 0;
+    return Math.round((d2 - d1) / 864e5);
+  },
+  
+  // Age in days from an ISO date to the current data date
+  ageDays(isoStr) {
+    const d = this.fromISO(isoStr);
+    if (!d) return 0;
+    return Math.max(0, Math.round((this._dataDate - d) / 864e5));
+  },
+  
+  // ISO week number (ISO 8601)
+  isoWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 864e5) + 1) / 7);
+  },
+  
+  // Week label: "W15 Apr 2026"
+  weekLabel(date) {
+    const mn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return "W" + this.isoWeek(date) + " " + mn[date.getMonth()] + " " + date.getFullYear();
+  },
+  
+  // ISO week start (Monday) for a given date
+  weekStart(date) {
+    const d = new Date(date);
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1);
+    d.setHours(0,0,0,0);
+    return d;
+  },
+  
+  // ISO week end (Sunday) for a given date
+  weekEnd(date) {
+    const ws = this.weekStart(date);
+    ws.setDate(ws.getDate() + 6);
+    ws.setHours(23,59,59,999);
+    return ws;
+  },
+  
+  // Validate a daily record before saving
+  validateRecord(rec) {
+    const issues = [];
+    if (!rec.iso || !/^\d{4}-\d{2}-\d{2}$/.test(rec.iso)) issues.push("Invalid ISO date");
+    if (!rec.date) issues.push("Missing display date");
+    if (!rec.stats || !rec.stats.actDone) issues.push("Missing stats");
+    if (rec.stats && rec.stats.actDone && rec.stats.actDone.length !== ALL_SUBS.length) 
+      issues.push("actDone length mismatch: " + rec.stats.actDone.length + " vs " + ALL_SUBS.length);
+    if (rec.stats && (rec.stats.overall < 0 || rec.stats.overall > 100)) 
+      issues.push("Overall out of range: " + rec.stats.overall);
+    return { valid: issues.length === 0, issues };
+  },
+  
+  // Check for duplicate records
+  findDuplicate(iso) {
+    return (D.hist.daily || []).findIndex(d => d.iso === iso);
+  },
+  
+  // Detect regression (new data worse than old)
+  detectRegression(newRec, oldRec) {
+    if (!oldRec || !oldRec.stats || !newRec.stats) return null;
+    const regressions = [];
+    newRec.stats.actDone.forEach((v, i) => {
+      const oldV = oldRec.stats.actDone[i] || 0;
+      if (v < oldV) regressions.push({ sub: ALL_SUBS[i]?.n || "Sub-"+i, old: oldV, new: v, delta: oldV - v });
+    });
+    return regressions.length > 0 ? regressions : null;
+  }
+};
+
+// ============================================================
+// AUDIT TRAIL
+// ============================================================
+function auditLog(action, details) {
+  if (!D.audit) D.audit = [];
+  D.audit.push({
+    ts: GOV.iso(),
+    action,
+    details,
+    dataDate: D.date
+  });
+  if (D.audit.length > 200) D.audit = D.audit.slice(-200);
+}
+
+// FIX A: Function to update all date-dependent constants — uses GOV
+function updateDates(isoDate){
+  if(!isoDate)return;
+  if(!GOV.setDataDate(isoDate)){
+    console.error("[updateDates] GOV rejected date:", isoDate);
+    return;
+  }
+  TODAY=GOV.now();
+  D._dateISO=GOV.iso();
+  DLEFT=Math.ceil((TARGET-TODAY)/864e5);
+  WLEFT=Math.round(DLEFT/7);
+  WELAPSED=Math.round((TODAY-EXT_START)/864e5/7);
+  BASELINE_RATE=D.v.length/PROJECT_WEEKS;
+}
+
+// ============================================================
+// FIX B: LIVE RATE ENGINE — Computes rates from actual daily records
+// ============================================================
+function computeLiveRates(){
+  const daily=D.hist.daily||[];
+  if(daily.length<2)return null; // Need at least 2 records
+  // Sort by ISO date
+  const sorted=[...daily].sort((a,b)=>a.iso.localeCompare(b.iso));
+  // Compute per-package weekly gains from consecutive records
+  const liveGains={};
+  ACTS.forEach(a=>liveGains[a.n]=[]);
+  for(let i=1;i<sorted.length;i++){
+    const prev=sorted[i-1],curr=sorted[i];
+    const daysBetween=Math.max(1,Math.round((new Date(curr.iso)-new Date(prev.iso))/864e5));
+    // For each package, calculate the gain in the LAST sub-activity
+    ACTS.forEach(a=>{
+      const li=a.ix[a.ix.length-1];
+      const prevDone=prev.stats.actDone[li]||0;
+      const currDone=curr.stats.actDone[li]||0;
+      const gain=currDone-prevDone;
+      // Normalize to weekly equivalent
+      const weeklyGain=daysBetween>0?gain*(7/daysBetween):gain;
+      liveGains[a.n].push(+weeklyGain.toFixed(1));
+    });
+  }
+  // Compute stats for each package
+  const result={};
+  for(const[pkg,gains] of Object.entries(liveGains)){
+    if(!gains.length){result[pkg]=null;continue}
+    const nonZero=gains.filter(x=>x>0);
+    const mean=gains.length?gains.reduce((a,b)=>a+b,0)/gains.length:0;
+    const variance=gains.length?gains.reduce((s,v)=>s+(v-mean)**2,0)/gains.length:0;
+    const stdDev=Math.sqrt(variance);
+    // Weighted recent (last entries get more weight)
+    let wSum=0,wCnt=0;
+    const recent=gains.slice(-6);
+    recent.forEach((v,i)=>{
+      const w=1+(i/recent.length);
+      wSum+=v*w;wCnt+=w;
+    });
+    const weightedRate=wCnt>0?wSum/wCnt:0;
+    result[pkg]={gains,mean:+mean.toFixed(1),stdDev:+stdDev.toFixed(1),weightedRate:+weightedRate.toFixed(1),n:gains.length};
+  }
+  return result;
+}
+
+// FIX C: Build live S-Curve from daily records
+function buildLiveSCurve(){
+  const daily=D.hist.daily||[];
+  if(daily.length<2)return null;
+  const sorted=[...daily].sort((a,b)=>a.iso.localeCompare(b.iso));
+  const labels=sorted.map(d=>d.date);
+  const datasets={};
+  ACTS.forEach(a=>{
+    const li=a.ix[a.ix.length-1];
+    datasets[a.n]=sorted.map(d=>d.stats.actDone[li]||0);
+  });
+  return{labels,datasets};
+}
+
+// ============================================================
+// CORE FUNCTIONS
+// ============================================================
+function pr(r){return r.trim().split("\n").map(l=>{const[id,cz,a]=l.split("|");return{id,cm:cz[0],z:+cz[1],a:a.split("").map(c=>c==="1"?1:c==="0"?0:+c/10)}})}
+function enc(vs){return vs.map(v=>v.id+"|"+v.cm+v.z+"|"+v.a.map(x=>x>=1?"1":x<=0?"0":""+Math.min(9,Math.round(x*10))).join("")).join("\n")}
+// V7 precision encoding — preserves 2 decimal places
+function encV7(vs){return JSON.stringify(vs.map(v=>({id:v.id,cm:v.cm,z:v.z,a:v.a.map(x=>+x.toFixed(2))})))}
+function decV7(s){try{const arr=JSON.parse(s);return arr.map(v=>({id:v.id,cm:v.cm,z:v.z,a:v.a}));}catch(e){return null}}
+function gs(vs,i){let d=0,w=0,n=0;vs.forEach(v=>{const x=v.a[i];x>=0.9?d++:x>0?w++:n++});return{d,w,n,t:vs.length}}
+function wop(vs){if(!vs.length)return 0;let ws=0,wt=0;ACTS.forEach(a=>{const li=a.ix[a.ix.length-1];let p=0;vs.forEach(v=>{p+=Math.min(v.a[li]>=0.9?1:v.a[li],1)});ws+=(p/vs.length)*a.w;wt+=a.w});return wt?ws/wt:0}
+function sop(vs){if(!vs.length)return 0;let s=0,c=0;vs.forEach(v=>v.a.forEach(x=>{s+=x>=0.9?1:Math.min(x,1);c++}));return c?s/c:0}
+// BULLETPROOF RATE ENGINE V7.1 — Pipeline-aware for trailing activities
+function smartRate(cat,done){
+  const live=computeLiveRates();
+  const g=WEEKLY_GAINS[cat];
+  const actObj=ACTS.find(a=>a.n===cat);
+  const actIdx=actObj?ACTS.indexOf(actObj):-1;
+  
+  // Step 1: Calculate historical rate from WEEKLY_GAINS (if available)
+  // V7.1 FIX: Use MEDIAN with spike protection (not weighted mean)
+  // Problem: A 44-spike in Pool or 30-spike in Utility MH distorts weighted averages
+  let histRate=0;
+  if(g&&g.length>=2){
+    // Get all non-zero weeks
+    const allNZ=g.filter(x=>x>0);
+    if(allNZ.length>=2){
+      // MEDIAN of last 8 non-zero values (spike-resistant)
+      const recent8=allNZ.slice(-8).sort((a,b)=>a-b);
+      const medIdx=Math.floor(recent8.length/2);
+      const median=recent8.length%2===0?(recent8[medIdx-1]+recent8[medIdx])/2:recent8[medIdx];
+      // MEAN of last 6 (for comparison)
+      const last6=allNZ.slice(-6);
+      const mean6=last6.reduce((a,b)=>a+b,0)/last6.length;
+      // Use the LOWER of median and mean (conservative) 
+      // This prevents spikes from inflating AND prevents too-low estimates
+      histRate=Math.min(median*1.2, Math.max(median*0.8, mean6));
+      // Hard cap: never more than 2x the median (spike protection)
+      histRate=Math.min(histRate, median*2);
+    }
+  }
+  
+  // Step 2: TRAILING ACTIVITY DETECTION
+  // Packages WITHOUT WEEKLY_GAINS (Utility Pipes, Handover) are trailing —
+  // they started producing completions MUCH later than project start.
+  // Using done/WELAPSED would divide by 30 weeks when they've only been active ~12.
+  if(!g && done>0 && actObj){
+    // Method A: PREDECESSOR PIPELINE — inherit rate from nearest upstream WITH data
+    if(actIdx>0){
+      // Scan backwards to find nearest predecessor with WEEKLY_GAINS
+      let predAct=null,predG=null;
+      for(let pi=actIdx-1;pi>=0;pi--){
+        const candidate=ACTS[pi];
+        if(WEEKLY_GAINS[candidate.n]&&WEEKLY_GAINS[candidate.n].length>=2){
+          predAct=candidate;predG=WEEKLY_GAINS[candidate.n];break;
+        }
+      }
+      if(predAct&&predG){
+        const predLi=predAct.ix[predAct.ix.length-1];
+        const predDone=gs(D.v,predLi).d;
+        // Predecessor active rate (mean of non-zero weeks)
+        const predNZ=predG.filter(x=>x>0);
+        const predMean=predNZ.length?predNZ.reduce((a,b)=>a+b,0)/predNZ.length:0;
+        // Conversion ratio = how many flow from predecessor to this activity
+        const conv=predDone>0?Math.min(1,done/predDone):0.5;
+        // Forward rate = predecessor mean × conversion (floor at 50% conversion)
+        const pipeRate=predMean*Math.max(0.5,conv);
+        histRate=Math.max(histRate,pipeRate);
+      }
+    }
+    
+    // Method B: ACTIVE PERIOD ESTIMATION
+    // Trailing activities didn't run from day 1. Estimate when they started.
+    // If 53/162 done, activity likely been active for ~(done/total × WELAPSED × 1.5) weeks
+    // Minimum 4 active weeks to avoid division spikes
+    const completionRatio=done/Math.max(1,D.v.length);
+    const estimatedActiveWeeks=Math.max(4, Math.round(WELAPSED * completionRatio * 1.8));
+    const activeRate=done/estimatedActiveWeeks;
+    histRate=Math.max(histRate,activeRate);
+    
+    // Method C: PIPELINE THROUGHPUT — if many villas are READY but not done,
+    // the forward rate is constrained by capacity, not production
+    if(actObj.ix.length===1){
+      // Single-stage activity (like Handover) — count villas with ALL predecessors done
+      const critIdx=ACTS.slice(0,-1).map(a=>a.ix[a.ix.length-1]);
+      const readyForThis=D.v.filter(v=>critIdx.every(ci=>v.a[ci]>=0.9)&&v.a[actObj.ix[0]]<0.9).length;
+      if(readyForThis>10){
+        // Large pipeline waiting — forward rate should account for clearance capacity
+        // Conservative: assume you can clear at least 30% of pipeline per week
+        const clearanceRate=Math.max(histRate, readyForThis*0.15);
+        histRate=Math.max(histRate,clearanceRate);
+      }
+    }
+  }
+  
+  // Step 3: Fallback for activities WITH partial WEEKLY_GAINS or zero rate
+  if(histRate===0)histRate=done/Math.max(1,WELAPSED);
+  
+  // Step 4: Live rate — ONLY full trust with 8+ gain points
+  if(live&&live[cat]&&live[cat].n>=8&&live[cat].weightedRate>0)return live[cat].weightedRate;
+  // Step 5: 5-7 points — BLEND 40% live + 60% historical
+  if(live&&live[cat]&&live[cat].n>=5&&live[cat].weightedRate>0)return histRate*0.6+live[cat].weightedRate*0.4;
+  // Step 6: 3-4 points — BLEND 15% live + 85% historical
+  if(live&&live[cat]&&live[cat].n>=3&&live[cat].weightedRate>0)return histRate*0.85+live[cat].weightedRate*0.15;
+  // Step 7: <3 points — Pure historical
+  return histRate;
+}
+function rateSource(cat){
+  const live=computeLiveRates();
+  if(live&&live[cat]&&live[cat].n>=8)return"live";
+  if(live&&live[cat]&&live[cat].n>=5)return"blended-high";
+  if(live&&live[cat]&&live[cat].n>=3)return"blended-low";
+  if(WEEKLY_GAINS[cat]&&WEEKLY_GAINS[cat].length>=2)return"historical";
+  // Trailing activities without WEEKLY_GAINS
+  const actObj=ACTS.find(a=>a.n===cat);
+  if(actObj&&gs(D.v,actObj.ix[actObj.ix.length-1]).d>0)return"pipeline";
+  return"estimated";
+}
+function fcDate(rem,rate){return rate>0?new Date(TODAY.getTime()+rem/rate*7*864e5):null}
+function fmtD(d){if(!d)return"TBD";return d.toLocaleDateString("en-GB",d.getFullYear()>2026?{day:"numeric",month:"short",year:"2-digit"}:{day:"numeric",month:"short"})}
+
+// Gradient intensity color (Committee 3 #5)
+function gi(pct,type){
+  if(type==="gn"){const i=Math.round(pct*2.55);return`rgba(26,138,92,${Math.max(.15,pct/100)})`}
+  if(type==="health"){
+    if(pct>=85)return"rgba(26,138,92,"+(0.2+pct/300)+")";
+    if(pct>=60)return"rgba(196,127,10,"+(0.15+pct/400)+")";
+    return"rgba(196,51,34,"+(0.2+(100-pct)/300)+")";
+  }
+  return"transparent";
+}
+
+// SVG Sparkline (Committee 3 #3)
+function sparkSVG(data,w=50,h=16,color="#1a73a7"){
+  if(!data||data.length<3)return"";
+  const mn=Math.min(...data),mx=Math.max(...data)||1,rng=mx-mn||1;
+  const pts=data.map((v,i)=>`${i/(data.length-1)*w},${h-2-(v-mn)/rng*(h-4)}`).join(" ");
+  return`<svg width="${w}" height="${h}" style="flex-shrink:0;vertical-align:middle"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+}
+
+// Radial SVG
+function radialSVG(pct,sz,lbl,clr){
+const r=sz/2-7,c=2*Math.PI*r,d=c*pct/100;
+return`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"><circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="var(--c3)" stroke-width="4.5"/><circle cx="${sz/2}" cy="${sz/2}" r="${r}" fill="none" stroke="${clr}" stroke-width="4.5" stroke-dasharray="${d} ${c-d}" stroke-linecap="round" transform="rotate(-90 ${sz/2} ${sz/2})"/><text x="${sz/2}" y="${sz/2-3}" text-anchor="middle" fill="${clr}" font-size="${sz/4.5}" font-weight="900" font-family="JetBrains Mono">${pct}%</text><text x="${sz/2}" y="${sz/2+12}" text-anchor="middle" fill="var(--t3)" font-size="${sz/11}" font-weight="600">${lbl}</text></svg>`}
+
+// ============================================================
+// ENGINE 1: MONTE CARLO SIMULATION (Committee 4 #1)
+// ============================================================
+function monteCarlo(rate,rem,stdDev,runs=1000){
+  if(rate<=0||rem<=0)return{p50:0,p80:0,p95:0,dates:[]};
+  const results=[];
+  for(let i=0;i<runs;i++){
+    let remaining=rem,weeks=0;
+    while(remaining>0&&weeks<200){
+      // Normal distribution approximation using Box-Muller
+      const u1=Math.random(),u2=Math.random();
+      const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+      const weeklyOutput=Math.max(0,rate+z*stdDev);
+      remaining-=weeklyOutput;
+      weeks++;
+    }
+    results.push(weeks);
+  }
+  results.sort((a,b)=>a-b);
+  const p=i=>results[Math.floor(results.length*i/100)];
+  const toDate=w=>new Date(TODAY.getTime()+w*7*864e5);
+  return{p10:p(10),p25:p(25),p50:p(50),p75:p(75),p80:p(80),p90:p(90),p95:p(95),
+    d50:toDate(p(50)),d80:toDate(p(80)),d95:toDate(p(95)),
+    min:results[0],max:results[results.length-1],results};
+}
+
+// ============================================================
+// ENGINE 2: SPC - Statistical Process Control (Committee 2 #1)
+// ============================================================
+function spcCalc(data){
+  if(!data||data.length<3)return null;
+  const n=data.length,mean=data.reduce((a,b)=>a+b,0)/n;
+  const variance=data.reduce((s,v)=>s+(v-mean)**2,0)/n;
+  const stdDev=Math.sqrt(variance);
+  const ucl=mean+3*stdDev;
+  const lcl=Math.max(0,mean-3*stdDev);
+  // Moving range for individuals chart
+  const mr=[];for(let i=1;i<data.length;i++)mr.push(Math.abs(data[i]-data[i-1]));
+  const mrBar=mr.length?mr.reduce((a,b)=>a+b,0)/mr.length:0;
+  // Special causes: points outside UCL/LCL or 7+ points same side of mean
+  const specials=[];
+  data.forEach((v,i)=>{if(v>ucl||v<lcl)specials.push({i,v,type:"outlier"})});
+  let runAbove=0,runBelow=0;
+  data.forEach((v,i)=>{
+    if(v>mean){runAbove++;runBelow=0}else{runBelow++;runAbove=0}
+    if(runAbove>=7)specials.push({i,v,type:"run_above"});
+    if(runBelow>=7)specials.push({i,v,type:"run_below"});
+  });
+  return{mean,stdDev,ucl,lcl,mrBar,specials,cv:mean>0?stdDev/mean:0,n};
+}
+
+// ============================================================
+// ENGINE 3: LINEAR REGRESSION (Committee 2 #3)
+// ============================================================
+function linReg(data){
+  const n=data.length;if(n<3)return{slope:0,intercept:0,r2:0};
+  let sx=0,sy=0,sxy=0,sxx=0,syy=0;
+  data.forEach((y,x)=>{sx+=x;sy+=y;sxy+=x*y;sxx+=x*x;syy+=y*y});
+  const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx);
+  const intercept=(sy-slope*sx)/n;
+  const ssRes=data.reduce((s,y,x)=>s+(y-(intercept+slope*x))**2,0);
+  const ssTot=data.reduce((s,y)=>s+(y-sy/n)**2,0);
+  const r2=ssTot>0?1-ssRes/ssTot:0;
+  // Weeks until rate reaches zero (if declining)
+  const weeksToZero=slope<0&&data[data.length-1]>0?Math.ceil(-data[data.length-1]/slope):null;
+  return{slope,intercept,r2,weeksToZero,predict:x=>intercept+slope*x};
+}
+
+// ============================================================
+// ENGINE 4: LITTLE'S LAW & THROUGHPUT (Committee 2 #2)
+// ============================================================
+function littlesLaw(V,actIdx){
+  const s=gs(V,actIdx);
+  const wip=s.w;
+  const act=ACTS.find(a=>a.ix.includes(actIdx));
+  const throughput=act?smartRate(act.n,s.d):s.d/Math.max(1,WELAPSED);
+  const leadTime=throughput>0?wip/throughput:999;
+  return{wip,throughput:+throughput.toFixed(1),leadTime:+leadTime.toFixed(1)};
+}
+
+// ============================================================
+// ENGINE 5: VARIATION & STABILITY (Committee 2 #4,#11)
+// ============================================================
+function stabilityIndex(data){
+  if(!data||data.length<4)return{cv:0,stability:"N/A",range:0};
+  const spc=spcCalc(data);
+  if(!spc)return{cv:0,stability:"N/A",range:0};
+  const range=Math.max(...data)-Math.min(...data);
+  const stability=spc.cv<0.3?"🟢 Stable":spc.cv<0.6?"🟡 Variable":"🔴 Unstable";
+  return{cv:spc.cv,stability,range,mean:spc.mean,stdDev:spc.stdDev};
+}
+
+// ============================================================
+// ENGINE 6: DYNAMIC RISK WEIGHTS (Committee 2 #7)
+// ============================================================
+function dynamicRisk(pct,delayW,rateGap,agedRatio,cCount,closureRatio){
+  // FIX E: Weights shift with deadline proximity, NORMALIZED to sum = 1.0
+  const urgency=Math.min(1,Math.max(0,1-DLEFT/150));
+  let wDelay=0.15+urgency*0.15;
+  let wRate=0.20-urgency*0.05;
+  let wRem=0.20-urgency*0.10;
+  let wAged=0.15;
+  let wCons=0.10;
+  let wClosure=0.20-urgency*0.05;
+  // Normalize so they always sum to exactly 1.0
+  const wTotal=wDelay+wRate+wRem+wAged+wCons+wClosure;
+  wDelay/=wTotal;wRate/=wTotal;wRem/=wTotal;wAged/=wTotal;wCons/=wTotal;wClosure/=wTotal;
+  const cR=Math.min(10,(1-pct)*10),cD=Math.min(10,delayW),cRt=Math.min(10,rateGap*8);
+  const cA=Math.min(10,agedRatio*20),cC=Math.min(10,cCount*2),cCl=Math.min(10,(1-closureRatio)*10);
+  return +(wRem*cR+wDelay*cD+wRate*cRt+wAged*cA+wCons*cC+wClosure*cCl).toFixed(1);
+}
+
+// ============================================================
+// ENGINE 7: FLOW-BASED FORECAST (Committee 4 #10)
+// ============================================================
+function flowForecast(pipe,rem,rate){
+  // Adjust forecast based on bottleneck conversion ratio
+  if(!pipe||pipe.length<2)return fcDate(rem,rate);
+  const minConv=Math.min(...pipe.slice(0,-1).map((p,i)=>pipe[i].d>0?pipe[i+1].d/pipe[i].d:1));
+  // If conversion < 0.5, the effective rate is constrained
+  const convPenalty=Math.max(0.5,Math.min(1,minConv+0.3));
+  return fcDate(rem,rate*convPenalty);
+}
+
+// ============================================================
+// ENGINE 8: CONSTRAINT-ADJUSTED THROUGHPUT (Committee 2 #5)
+// ============================================================
+function constraintAdjustedRate(baseRate,pkg){
+  const openCons=D.constraints.filter(c=>(c.pkg==="ALL"||c.pkg===pkg)&&c.status!=="Resolved");
+  if(!openCons.length)return baseRate;
+  // Each constraint reduces capacity by estimated %
+  const typePenalty={Access:0.25,Material:0.30,Inspection:0.15,Design:0.20,Manpower:0.35,Predecessor:0.20,Client:0.15};
+  let penalty=0;
+  openCons.forEach(c=>{penalty+=typePenalty[c.type]||0.1});
+  return baseRate*Math.max(0.2,1-Math.min(0.8,penalty));
+}
+
+// ============================================================
+// ENGINE 9: CORRELATION MATRIX (Committee 2 #12)
+// ============================================================
+function correlationMatrix(){
+  const gains=ACTS.map(a=>{
+    const g=WEEKLY_GAINS[a.n];
+    return g||Array(WELAPSED).fill(0);
+  });
+  const n=gains[0].length;
+  const matrix=[];
+  for(let i=0;i<gains.length;i++){
+    const row=[];
+    for(let j=0;j<gains.length;j++){
+      if(i===j){row.push(1);continue}
+      const xi=gains[i],xj=gains[j];
+      const mx=xi.reduce((a,b)=>a+b,0)/n,my=xj.reduce((a,b)=>a+b,0)/n;
+      let sxy=0,sxx=0,syy=0;
+      for(let k=0;k<n;k++){sxy+=(xi[k]-mx)*(xj[k]-my);sxx+=(xi[k]-mx)**2;syy+=(xj[k]-my)**2}
+      row.push(sxx*syy>0?+(sxy/Math.sqrt(sxx*syy)).toFixed(2):0);
+    }
+    matrix.push(row);
+  }
+  return matrix;
+}
+
+// ============================================================
+// MAIN ANALYTICS ENGINE (V6 Enhanced)
+// ============================================================
+function analyze(V,perPkgRates=null){
+return ACTS.map(a=>{
+const li=a.ix[a.ix.length-1],s=gs(V,li),pct=s.t?s.d/s.t:0,rem=s.t-s.d;
+// Smart rate: weighted recent, active-weeks aware
+let baseRate=smartRate(a.n,s.d);
+if(baseRate===0&&s.w>0){let tp=0;V.forEach(v=>{const x=v.a[li];if(x>0)tp+=x});baseRate=tp/Math.max(1,WELAPSED)}
+if(baseRate===0&&a.ix.length>1){const fS=gs(V,a.ix[0]);baseRate=smartRate(a.n,fS.d)*0.5}
+// Apply per-package scenario rate
+const pkgBoost=perPkgRates?perPkgRates[a.n]||0:scnRates[a.n]||0;
+const rate=baseRate*(1+pkgBoost/100);
+// Main forecast uses ACTUAL rate (no constraint penalty)
+const reqRate=DLEFT>0?rem/(DLEFT/7):999;
+const fd=fcDate(rem,rate);
+// Constraint-adjusted rate kept as separate metric for comparison
+const adjRate=constraintAdjustedRate(rate,a.n);
+const fdConstrained=fcDate(rem,adjRate);
+const delayW=fd?Math.max(0,Math.round((fd-TARGET)/864e5/7)):rem>0?99:0;
+const rateGap=rate>0?Math.max(0,(reqRate-rate)/rate):9;
+const agedWIP=V.filter(v=>v.a[li]>0&&v.a[li]<0.9).length;
+const agedRatio=V.length?agedWIP/V.length:0;
+const closureRatio=(s.d+s.w)>0?s.d/(s.d+s.w):1;
+const cCount=D.constraints.filter(c=>(c.pkg==="ALL"||c.pkg===a.n)&&c.status!=="Resolved").length;
+const risk=rem<=0?0:dynamicRisk(pct,delayW,rateGap,agedRatio,cCount,closureRatio);
+const pei=BASELINE_RATE>0?+(rate/BASELINE_RATE).toFixed(2):0;
+const pipe=a.ix.map((idx,si)=>{const ss=gs(V,idx);return{n:a.su[si],d:ss.d,w:ss.w,p:ss.t?ss.d/ss.t:0}});
+const bn=pipe.reduce((m,p)=>p.p<m.p?p:m,pipe[0]);
+const ld=pipe.reduce((m,p)=>p.p>m.p?p:m,pipe[0]);
+const convRatios=[];
+for(let i=1;i<pipe.length;i++)convRatios.push(pipe[i-1].d>0?pipe[i].d/pipe[i-1].d:0);
+// Flow-based forecast (Committee 4 #10)
+const fdFlow=flowForecast(pipe,rem,rate);
+// Monte Carlo (Committee 4 #1)
+// FIX V7.1: ONLY use live gains when we have 5+ data points (otherwise hardcoded is better)
+const liveRates=computeLiveRates();
+const liveData=liveRates&&liveRates[a.n]&&liveRates[a.n].n>=5?liveRates[a.n]:null;
+const wg=liveData?liveData.gains:(WEEKLY_GAINS[a.n]||[]);
+const spcData=wg.length>=3?spcCalc(wg):null;
+// FIX G: Monte Carlo uses actual stdDev from live data or SPC
+const mcStdDev=liveData?liveData.stdDev:(spcData?spcData.stdDev:rate*0.25);
+const mc=monteCarlo(rate,rem,mcStdDev,500);
+// Little's Law (Committee 2 #2)
+const ll=littlesLaw(V,li);
+// Trend from best available data
+const trendData=wg.length>=3?wg.slice(-8):[];
+const trend=linReg(trendData);
+const stab=stabilityIndex(trendData);
+// Rate source for transparency
+const rSrc=rateSource(a.n);
+return{...a,s,pct,rem,rate,adjRate,baseRate,reqRate,fd,fdConstrained,fdFlow,delayW,rateGap,risk,pei,pipe,bn,ld,
+  gap:ld.d-bn.d,agedWIP,closureRatio,cCount,convRatios,mc,ll,trend,stab,spcData,rSrc};
+})}
+
+// Readiness & Handover (from V5)
+function villaReadiness(v){let d=0;v.a.forEach(x=>{if(x>=0.9)d++});let seq=0;ACTS.forEach(a=>{for(let i=1;i<a.ix.length;i++){if(v.a[a.ix[i]]>v.a[a.ix[i-1]]+0.1)seq+=0.05}});const vc=D.constraints.filter(c=>c.villa===v.id&&c.status!=="Resolved").length;return Math.max(0,Math.min(1,(d/19)*0.5+(1-seq)*0.3+(1-Math.min(0.3,vc*0.1))*0.2))}
+function isHandoverReady(v){const ci=[4,9,12,15,17];const acd=ci.every(i=>v.a[i]>=0.9);const hd=v.a[18]>=0.9;return{allCritDone:acd,hoDone:hd,ready:acd&&hd,nearReady:acd&&!hd}}
+
+// Zone Analysis
+function zoneAnalysis(V){return ZONES.map(zn=>{const zvs=V.filter(v=>v.cm===zn.c&&v.z===zn.z);if(!zvs.length)return null;const done=zvs.filter(v=>v.a.every(x=>x>=0.9)).length;const active=zvs.filter(v=>v.a.some(x=>x>0)&&!v.a.every(x=>x>=0.9)).length;const ns=zvs.filter(v=>v.a.every(x=>x<=0)).length;const nf=zvs.filter(v=>{const s2=v.a.filter(x=>x>=0.9).length;return s2>=16&&s2<19}).length;const hr=zvs.filter(v=>isHandoverReady(v).ready).length;const wp2=Math.round(wop(zvs)*100);const zAn=analyze(zvs);const mxD=Math.max(...zAn.map(a=>a.delayW));const zC=D.constraints.filter(c=>zvs.some(v=>c.villa===v.id)&&c.status!=="Resolved").length;return{...zn,zvs,done,active,ns,nf,hr,wp:wp2,mxD,zC,total:zvs.length}}).filter(Boolean)}
+
+// ============================================================
+// INSIGHT ENGINE V6 (Enhanced)
+// ============================================================
+function generateInsights(V,an){
+  const insights=[];
+  const wp=Math.round(wop(V)*100);
+  const fd=V.filter(v=>v.a.every(x=>x>=0.9)).length;
+  insights.push({type:"desc",ic:"📍",t:`Project at ${wp}% weighted · ${fd}/${V.length} done`,d:`${DLEFT} days remaining. ${WLEFT} weeks to target.`});
+  // False Progress
+  an.forEach(a=>{if(a.pipe.length>1&&a.ld.p-a.bn.p>0.3)insights.push({type:"diag",ic:"⚠️",t:`False Progress — ${a.n}`,d:`${a.ld.n} at ${(a.ld.p*100).toFixed(0)}% but ${a.bn.n} only ${(a.bn.p*100).toFixed(0)}%. Gap: ${a.gap} villas.`})});
+  // Aging WIP
+  an.forEach(a=>{if(a.agedWIP>20&&a.closureRatio<0.7)insights.push({type:"diag",ic:"🔄",t:`Aging WIP — ${a.n}`,d:`${a.agedWIP} in WIP, closure ratio ${(a.closureRatio*100).toFixed(0)}%. Too many open fronts.`})});
+  // Predictive - Monte Carlo
+  an.filter(a=>a.rem>0&&a.mc.d80).forEach(a=>{if(a.mc.d80>TARGET)insights.push({type:"pred",ic:"🔮",t:`${a.n}: 80% chance of missing target`,d:`Monte Carlo P80: ${fmtD(a.mc.d80)}. Need acceleration to hit 14 Jul.`})});
+  // SPC Special Causes
+  an.forEach(a=>{if(a.spcData&&a.spcData.specials.length>0)insights.push({type:"diag",ic:"📊",t:`SPC Alert — ${a.n}`,d:`${a.spcData.specials.length} special cause(s) detected. Production process out of control.`})});
+  // Trend declining
+  an.forEach(a=>{if(a.trend.slope<-0.3&&a.rem>0)insights.push({type:"pred",ic:"📉",t:`Declining Trend — ${a.n}`,d:`Rate dropping ${Math.abs(a.trend.slope).toFixed(1)}/wk. ${a.trend.weeksToZero?'Reaches zero in ~'+a.trend.weeksToZero+' weeks.':''}` })});
+  // Flow Break
+  an.forEach(a=>{a.convRatios.forEach((cr,i)=>{if(cr<0.5&&a.pipe[i].d>10)insights.push({type:"diag",ic:"🔗",t:`Flow Break — ${a.n}`,d:`${a.pipe[i].n}→${a.pipe[i+1].n} conversion only ${(cr*100).toFixed(0)}%.`})})});
+  // High Leverage
+  const hl=an.filter(a=>a.rem>0).sort((a,b)=>b.delayW*b.w-a.delayW*a.w)[0];
+  if(hl&&hl.delayW>0)insights.push({type:"presc",ic:"💡",t:`Focus: ${hl.n}`,d:`Highest weighted delay. Bottleneck at ${hl.bn.n}. Adding ${Math.max(1,Math.ceil(hl.reqRate-hl.rate))}/wk has biggest impact.`});
+  // Recovery impossible
+  an.forEach(a=>{if(a.rem>0&&a.rate>0){const acc=Math.round((a.reqRate/a.rate-1)*100);if(acc>150)insights.push({type:"alert",ic:"🚫",t:`Recovery Unlikely — ${a.n}`,d:`Needs ${acc}% acceleration. Consider scope/schedule revision.`})}});
+  // Constraint impact
+  const openC=D.constraints.filter(c=>c.status!=="Resolved");
+  if(openC.length>3)insights.push({type:"presc",ic:"🔗",t:`${openC.length} open constraints`,d:`Total estimated impact: ${openC.reduce((s,c)=>s+(c.impact||0),0)} days. Clear ${openC.filter(c=>GOV.ageDays(c.identified?.split?.('T')?.[0]||c.identified)>14).length} overdue items.`});
+  // Handover
+  const hoNear=V.filter(v=>isHandoverReady(v).nearReady);
+  if(hoNear.length>5)insights.push({type:"presc",ic:"🏁",t:`${hoNear.length} villas near handover`,d:`All civil done — only handover pending. Clear inspections for quick wins.`});
+  return insights;
+}
+
+// ============================================================
+// ACTION GENERATOR (Committee 3 #6 - Action First)
+// ============================================================
+function generateActions(V,an){
+  const actions=[];
+  an.filter(a=>a.rem>0).forEach(d=>{
+    if(d.risk>=6)actions.push({pri:1,t:`Mobilize recovery: ${d.n}`,d:`Risk ${d.risk}/10. Rate ${d.rate.toFixed(1)} vs required ${d.reqRate.toFixed(1)}/wk. Bottleneck: ${d.bn.n}.`,pkg:d.n});
+    if(d.closureRatio<0.5&&d.agedWIP>15)actions.push({pri:2,t:`Close-out: ${d.n}`,d:`${d.agedWIP} stuck in WIP. Stop new starts, finish existing.`,pkg:d.n});
+    if(d.trend.slope<-0.5)actions.push({pri:2,t:`Arrest decline: ${d.n}`,d:`Rate dropping ${Math.abs(d.trend.slope).toFixed(1)}/wk. Investigate root cause.`,pkg:d.n});
+    d.convRatios.forEach((cr,i)=>{if(cr<0.5&&d.pipe[i].d>10)actions.push({pri:2,t:`Clear ${d.pipe[i+1].n} backlog: ${d.n}`,d:`Conversion ${(cr*100).toFixed(0)}%. ${d.pipe[i].d} upstream vs ${d.pipe[i+1].d} downstream.`,pkg:d.n})});
+  });
+  D.constraints.filter(c=>c.status!=="Resolved").forEach(c=>{const age=GOV.ageDays(c.identified?.split?.('T')?.[0]||c.identified);if(age>7)actions.push({pri:age>14?1:2,t:`Resolve: ${c.type} — ${c.villa||c.pkg}`,d:`${c.desc}. Open ${age}d. Impact: ${c.impact||0}d.`,pkg:c.pkg})});
+  const hoN=V.filter(v=>isHandoverReady(v).nearReady);
+  if(hoN.length>3)actions.push({pri:2,t:`Clear handover: ${hoN.length} villas`,d:`All civil done. Schedule inspections.`,pkg:"Handover"});
+  return actions.sort((a,b)=>a.pri-b.pri);
+}
+
+// Leading Indicators (Committee 4 #6)
+function leadingIndicators(V,an){
+  const hoN=V.filter(v=>isHandoverReady(v).nearReady).length;
+  const workfrontReady=V.filter(v=>{let started=v.a.some(x=>x>0);let notDone=!v.a.every(x=>x>=0.9);return started&&notDone&&villaReadiness(v)>0.6}).length;
+  const openC=D.constraints.filter(c=>c.status!=="Resolved").length;
+  const resolvedThisWeek=D.constraints.filter(c=>c.status==="Resolved"&&c.resolved&&GOV.ageDays(c.resolved?.split?.('T')?.[0]||c.resolved)<7).length;
+  const avgStability=an.filter(a=>a.stab.cv>0).reduce((s,a)=>s+a.stab.cv,0)/(an.filter(a=>a.stab.cv>0).length||1);
+  const trendHealth=an.filter(a=>a.trend.slope>=0).length;
+  return{hoN,workfrontReady,openC,resolvedThisWeek,avgStability:+avgStability.toFixed(2),trendHealth,totalPkgs:an.filter(a=>a.rem>0).length};
+}
+
+// PPC (Committee 4 #5)
+function calcPPC(){
+  const ppc=D.ppc||[];
+  if(!ppc.length)return[];
+  return ppc.map(p=>{
+    const planned=Object.values(p.plan).reduce((s,v)=>s+v,0);
+    const actual=Object.values(p.actual||{}).reduce((s,v)=>s+v,0);
+    return{...p,planned,actual,ppc:planned>0?Math.round(actual/planned*100):0};
+  });
+}
+
+// Forecast Accuracy (Committee 4 #2)
+function calcFcAccuracy(){
+  return(D.fcAccuracy||[]).map(f=>{
+    const err=f.predicted>0?Math.abs(f.actual-f.predicted)/f.predicted*100:0;
+    return{...f,error:+err.toFixed(1),accurate:err<20};
+  });
+}
+// ============================================================
+// TAB STRUCTURE (Committee 3 #1 - Tab Grouping)
+// ============================================================
+const TAB_GROUPS=[
+{label:"CONTROL",tabs:[{id:"exec",l:"🎯 Executive"},{id:"forecast",l:"📊 Forecast"},{id:"handover",l:"🏁 Handover"}]},
+{label:"ANALYZE",tabs:[{id:"spc",l:"📈 SPC & Flow"},{id:"balance",l:"⚖️ Balance"},{id:"zones",l:"🗺️ Zones"}]},
+{label:"TRACK",tabs:[{id:"daily",l:"📅 Daily"},{id:"weekly",l:"📈 Weekly"},{id:"ops",l:"🏘️ Ops"}]},
+{label:"MANAGE",tabs:[{id:"constraints",l:"🔗 Constraints"},{id:"actions",l:"⚡ Actions"},{id:"compare",l:"📸 Compare"},{id:"audit",l:"📜 Audit"}]}
+];
+const ALL_TABS=TAB_GROUPS.flatMap(g=>g.tabs);
+
+function initUI(){
+let navHTML="";
+TAB_GROUPS.forEach(g=>{
+navHTML+=`<div class="nav-grp"><div class="nav-grp-lbl">${g.label}</div>`;
+g.tabs.forEach(t=>{navHTML+=`<div class="tab ${t.id===curTab?'on':''}" data-t="${t.id}">${t.l}</div>`});
+navHTML+=`</div>`;
+});
+document.getElementById("nb").innerHTML=navHTML;
+document.getElementById("pns").innerHTML=ALL_TABS.map(t=>`<div class="pnl ${t.id!==curTab?'hide':''}" id="p_${t.id}"></div>`).join("");
+document.querySelectorAll(".tab").forEach(el=>{el.onclick=()=>{curTab=el.dataset.t;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.t===curTab));document.querySelectorAll(".pnl").forEach(x=>x.classList.toggle("hide",x.id!=="p_"+curTab));render()}});
+}
+
+// Banner
+function updateBanner(){
+const V=D.v,wp=Math.round(wop(V)*100),an=analyze(V);
+const crit=an.filter(a=>a.risk>=6).length,atR=an.filter(a=>a.risk>=3&&a.risk<6).length;
+// Project completion = LATEST forecast across ALL packages (not worst risk)
+const activePkgs=an.filter(a=>a.rem>0&&a.fd);
+const latestFd=activePkgs.length?activePkgs.reduce((mx,a)=>a.fd>mx?a.fd:mx,new Date(0)):null;
+const hr=V.filter(v=>isHandoverReady(v).ready).length;
+const tc=crit?"tag-rd":atR?"tag-yl":"tag-gn";
+const tt=crit?`🔴 ${crit} CRITICAL`:(atR?`⚠️ ${atR} AT RISK`:"✅ ON TRACK");
+// Data trust indicator
+const dailyCount=D.hist.daily?.length||0;
+const trustLvl=dailyCount>=10?"🟢 HIGH":dailyCount>=3?"🟡 BUILDING":"🔴 LOW";
+const trustClr=dailyCount>=10?"var(--gn)":dailyCount>=3?"var(--yl)":"var(--rd)";
+const rSrcs=[...new Set(an.map(a=>rateSource(a.n)))];
+const rSrcLabel=rSrcs.includes("live")?"Live":"Hist";
+document.getElementById("execBanner").innerHTML=`📍 <b style="color:var(--t1)">EXT Works</b> <span class="mono" style="color:var(--ac);font-weight:800">${wp}%</span> · Projected: <b style="color:${latestFd&&latestFd>TARGET?'var(--rd)':'var(--gn)'}">${latestFd?fmtD(latestFd):'Done'}</b> · <span class="tag ${tc}">${tt}</span> · 🏁 <b style="color:var(--gn)">${hr}</b> Handover · <span style="color:var(--t3)">${DLEFT}d left</span> · <span style="color:${trustClr};font-size:8px;font-weight:700">${trustLvl} (${dailyCount} recs · ${rSrcLabel})</span>`;
+}
+
+// ============================================================
+// 1. EXECUTIVE (Hero KPI + Action-First + Sparklines)
+// ============================================================
+function renderExec(){
+const V=D.v,T=V.length,an=analyze(V);
+const wp=Math.round(wop(V)*100),sp=Math.round(sop(V)*100);
+const fd2=V.filter(v=>v.a.every(x=>x>=0.9)).length;
+const hr=V.filter(v=>isHandoverReady(v).ready).length;
+const hn=V.filter(v=>isHandoverReady(v).nearReady).length;
+const insights=generateInsights(V,an);
+const actions=generateActions(V,an);
+const li=leadingIndicators(V,an);
+
+// Hero KPI (Committee 3 #2)
+let heroHTML=`<div class="grid" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+<div class="hero-kpi"><div class="lbl">Handover Ready / Target</div><div class="hero-val" style="color:${hr/T>0.5?'var(--gn)':'var(--ac)'}">${hr}<span style="font-size:20px;color:var(--t3)">/${T}</span></div><div class="hero-sub">${(hr/T*100).toFixed(0)}% · +${hn} near ready · ${WLEFT}w remaining</div></div>
+<div class="cd kpi"><div class="lbl">Weighted</div><div class="val" style="color:${wp>=70?'var(--gn)':wp>=45?'var(--yl)':'var(--rd)'}">${wp}%</div><div class="sub">${sparkSVG(SCURVE["Pump Room"]?.slice(-8)||[],40,12,wp>=60?"#1a8a5c":"#c43322")} trend</div></div>
+<div class="cd kpi"><div class="lbl">Days Left</div><div class="val" style="color:var(--yl)">${DLEFT}</div><div class="sub">${WLEFT} weeks</div></div>
+<div class="cd kpi"><div class="lbl">Critical</div><div class="val" style="color:${an.filter(a=>a.risk>=6).length?'var(--rd)':'var(--gn)'}">${an.filter(a=>a.risk>=6).length}</div><div class="sub">${an.filter(a=>a.risk>=3&&a.risk<6).length} at risk</div></div>
+<div class="cd kpi"><div class="lbl">Constraints</div><div class="val" style="color:var(--og)">${D.constraints.filter(c=>c.status!=="Resolved").length}</div><div class="sub">open items</div></div>
+</div>`;
+
+// Action-First Box (Committee 3 #6)
+let actBox="";
+if(actions.length){
+actBox=`<div class="action-box"><h3>⚡ Top Actions Right Now</h3>`;
+actions.slice(0,3).forEach((a,i)=>{actBox+=`<div class="act-item"><div class="act-num">${i+1}</div><div><b>${a.t}</b><br><span style="opacity:.7;font-size:10px">${a.d}</span></div></div>`});
+actBox+=`</div>`;
+}
+
+// Leading Indicators (Committee 4 #6)
+let liHTML=`<div class="grid g6" style="margin-bottom:8px">
+<div class="cd kpi" style="padding:8px"><div class="lbl">Workfront Ready</div><div class="val" style="font-size:20px;color:var(--ac)">${li.workfrontReady}</div><div class="sub">villas ready to work</div></div>
+<div class="cd kpi" style="padding:8px"><div class="lbl">HO Pipeline</div><div class="val" style="font-size:20px;color:var(--gn)">${li.hoN}</div><div class="sub">near handover</div></div>
+<div class="cd kpi" style="padding:8px"><div class="lbl">Open Constraints</div><div class="val" style="font-size:20px;color:var(--rd)">${li.openC}</div><div class="sub">${li.resolvedThisWeek} resolved/wk</div></div>
+<div class="cd kpi" style="padding:8px"><div class="lbl">Rate Stability</div><div class="val" style="font-size:20px;color:${li.avgStability<0.4?'var(--gn)':'var(--yl)'}">${li.avgStability}</div><div class="sub">CV (lower=better)</div></div>
+<div class="cd kpi" style="padding:8px"><div class="lbl">Trend Health</div><div class="val" style="font-size:20px;color:${li.trendHealth>=li.totalPkgs-1?'var(--gn)':'var(--rd)'}">${li.trendHealth}/${li.totalPkgs}</div><div class="sub">pkgs trending up</div></div>
+<div class="cd kpi" style="padding:8px"><div class="lbl">PPC</div><div class="val" style="font-size:20px;color:var(--pp)">${calcPPC().length?calcPPC().slice(-1)[0]?.ppc+'%':'—'}</div><div class="sub">plan reliability</div></div>
+</div>`;
+
+// Activity Status with sparklines — USES analyze() rate as single source
+let actHTML="";
+ACTS.forEach((act,actIdx)=>{
+const clr=CAT_C[act.n]||"#666";
+const pkgData=an[actIdx]; // Rate from analyze() — single source of truth
+actHTML+=`<div class="cat-group"><div class="cat-header" style="background:${clr};padding:4px 10px;font-size:10px">${act.ic} ${act.n}</div>`;
+act.su.forEach((sub,si)=>{
+const idx=act.ix[si];const s=gs(V,idx);let wp2=0;V.forEach(v=>{wp2+=v.a[idx]>=0.9?1:Math.min(v.a[idx],1)});
+const p=s.t?(wp2/s.t)*100:0;const rm=s.t-s.d;
+// Use PACKAGE rate from analyze() for ALL sub-activities — consistent with Forecast tab
+const fd3=fcDate(rm,pkgData.rate);
+const fS=rm<=0?"✅":fmtD(fd3);const fC=rm<=0?"var(--gn)":fd3&&fd3<=TARGET?"var(--gn)":"var(--rd)";
+const hk=Object.keys(SCURVE).find(k=>act.n.includes(k));const spk=hk?SCURVE[hk].slice(-8):[];
+actHTML+=`<div class="cat-row"><div style="width:90px;font-size:10px;font-weight:600;color:var(--t1)">${sub}</div>
+<div style="flex:1;height:12px;background:var(--c3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${p}%;background:${p>=90?clr:p>=60?'var(--yl)':'var(--rd)'};border-radius:3px"></div></div>
+<div class="mono" style="width:35px;text-align:right;font-size:11px;font-weight:800;color:${p>=90?clr:p>=60?'var(--yl)':'var(--rd)'}">${p.toFixed(0)}%</div>
+<div class="mono" style="width:55px;font-size:9px;color:var(--t2)">${s.d}${s.w?'+'+s.w:''}/${s.t}</div>
+${sparkSVG(spk,40,12,clr)}
+<div class="mono" style="width:55px;text-align:right;font-size:9px;font-weight:700;color:${fC}">${fS}</div></div>`;});
+actHTML+=`</div>`;});
+
+// Heatmap
+let hmHTML=`<div style="display:grid;grid-template-columns:70px repeat(${ACTS.length},1fr);gap:2px">`;
+hmHTML+=`<div class="hm-cell" style="font-size:8px;color:var(--t3)">Zone</div>`;
+ACTS.forEach(a=>hmHTML+=`<div class="hm-cell" style="font-size:8px;font-weight:700;color:var(--t1);background:var(--c2)">${a.ic}</div>`);
+ZONES.forEach(zn=>{const zvs=V.filter(v=>v.cm===zn.c&&v.z===zn.z);if(!zvs.length)return;
+hmHTML+=`<div class="hm-cell" style="font-size:9px;font-weight:700;color:var(--t1);background:var(--c2)">${CN[zn.c][0]}${zn.z}</div>`;
+ACTS.forEach(a=>{const li2=a.ix[a.ix.length-1];const s=gs(zvs,li2);const p=s.t?Math.round(s.d/s.t*100):0;
+hmHTML+=`<div class="hm-cell" style="background:${gi(p,"health")};color:${p>=90?'var(--gn)':p>=60?'var(--yl)':'var(--rd)'};font-size:10px">${p}%</div>`;});
+});hmHTML+=`</div>`;
+
+// Insights (top 5)
+let insHTML=insights.slice(0,5).map(ins=>{
+const bg=ins.type==="alert"?'var(--rdBg)':ins.type==="pred"?'var(--ppBg)':ins.type==="presc"?'var(--acBg)':'var(--ylBg)';
+return`<div class="insight" style="background:${bg}"><div class="insight-ic" style="background:rgba(0,0,0,.05)">${ins.ic}</div><div><div style="font-size:11px;font-weight:700;color:var(--t1)">${ins.t}</div><div style="font-size:9px;color:var(--t3);line-height:1.4">${ins.d}</div></div></div>`;
+}).join("");
+
+document.getElementById("p_exec").innerHTML=`${heroHTML}${actBox}${liHTML}
+<div class="grid g2" style="margin-bottom:8px">
+<div><div class="sec"><h2>📋 Activity Status</h2></div><div class="cd" style="padding:6px 8px">${actHTML}</div></div>
+<div><div class="sec"><h2>🗺️ Zone Heatmap</h2></div><div class="cd">${hmHTML}</div>
+<div class="sec"><h2>🧠 Insights</h2><div class="tg">${insights.length} generated</div></div>${insHTML}</div>
+</div>
+<div class="cd"><div class="lbl" style="margin-bottom:4px">S-Curve — All Categories</div><div style="position:relative;height:160px"><canvas id="scC"></canvas></div></div>`;
+
+setTimeout(()=>{const c1=document.getElementById("scC");if(c1){if(charts.sc)charts.sc.destroy();
+// FIX C: Use LIVE S-Curve data from daily records when available
+const liveSC=buildLiveSCurve();
+let scLabels,scDatasets;
+if(liveSC&&liveSC.labels.length>=8){
+  scLabels=liveSC.labels;
+  const colors={"Water Tank":"#2980b9","Pump Room":"#27ae60","Pool":"#e67e22","Utility MH":"#8e44ad","Utility Pipes":"#16a085","Handover":"#c0392b"};
+  scDatasets=ACTS.map(a=>({label:a.n,data:liveSC.datasets[a.n]||[],borderColor:colors[a.n]||"#888",backgroundColor:"transparent",borderWidth:1.5,pointRadius:1,tension:.3})).filter(d=>d.data.some(v=>v>0));
+  scDatasets.push({label:"Target",data:Array(scLabels.length).fill(D.v.length),borderColor:"rgba(196,51,34,.2)",borderWidth:1,borderDash:[4,3],pointRadius:0});
+}else{
+  scLabels=SCURVE_L;
+  scDatasets=Object.entries(SCURVE).map(([n,d],i)=>({label:n,data:d,borderColor:["#2980b9","#27ae60","#e67e22","#8e44ad"][i],backgroundColor:"transparent",borderWidth:1.5,pointRadius:0,tension:.3}));
+  scDatasets.push({label:"Target",data:Array(22).fill(162),borderColor:"rgba(196,51,34,.2)",borderWidth:1,borderDash:[4,3],pointRadius:0});
+}
+charts.sc=new Chart(c1,{type:"line",data:{labels:scLabels,datasets:scDatasets},options:{scales:{x:{ticks:{color:"#8a7f6e",font:{size:7}},grid:{color:"#efece7"}},y:{min:0,max:D.v.length+10,ticks:{color:"#8a7f6e",font:{size:8},stepSize:40},grid:{color:"#efece7"}}},plugins:{legend:{labels:{color:"#5a5040",font:{size:8},usePointStyle:true}},tooltip:{mode:'index',intersect:false,backgroundColor:'#faf8f5',titleColor:'#2c2416',bodyColor:'#5a5040',borderColor:'#d8d4cc',borderWidth:1,padding:6}},responsive:true,maintainAspectRatio:false}});}},80);
+}
+
+// ============================================================
+// 2. FORECAST (Monte Carlo + Per-Package Sliders)
+// ============================================================
+function renderForecast(){
+const V=D.v,an=analyze(V);
+
+// Per-package sliders (Committee 4 #4)
+let sliderHTML=`<div class="cd" style="margin-bottom:8px;padding:10px">
+<div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:6px">🎚️ Per-Package Rate Adjustment</div>
+<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Adjust each package independently. Example: +50% means 6/wk → 9/wk.</div>`;
+ACTS.filter(a=>an.find(d=>d.n===a.n&&d.rem>0)).forEach(a=>{
+sliderHTML+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+<div style="width:80px;font-size:10px;font-weight:600;color:var(--t1)">${a.ic} ${a.n}</div>
+<input type="range" min="0" max="200" value="${scnRates[a.n]||0}" style="flex:1;height:4px" oninput="scnRates['${a.n}']=+this.value;this.nextElementSibling.textContent='+'+this.value+'%';renderForecast()">
+<div class="mono" style="width:45px;font-size:10px;font-weight:700;color:var(--ac)">+${scnRates[a.n]||0}%</div>
+</div>`;});
+// Scenario Library (Committee 4 #12)
+sliderHTML+=`<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+<button class="scn-btn" onclick="applyScenario('reset')">🔄 Reset</button>
+<button class="scn-btn" onclick="applyScenario('add2crews')">👷 +2 Crews Pool</button>
+<button class="scn-btn" onclick="applyScenario('allplus30')">📈 All +30%</button>
+<button class="scn-btn" onclick="applyScenario('focusHO')">🏁 Focus Handover</button>
+<button class="scn-btn" onclick="applyScenario('loseZone')">🚫 Lose Zone 2wk</button>
+</div></div>`;
+
+// Monte Carlo results (Committee 4 #1)
+let mcHTML=`<div class="sec"><h2>🎲 Monte Carlo Forecast</h2><div class="tg">500 simulations per package · Statistically defensible projections</div></div>`;
+mcHTML+=`<div class="cd" style="overflow-x:auto;margin-bottom:8px"><table class="tbl"><thead><tr><th>Package</th><th>Current Rate</th><th>P50 Date</th><th>P80 Date</th><th>P95 Date</th><th>Min Weeks</th><th>Max Weeks</th><th>Hits Target?</th></tr></thead><tbody>`;
+an.forEach(d=>{
+if(d.rem<=0){mcHTML+=`<tr><td>${d.ic} ${d.n}</td><td colspan="7" style="color:var(--gn);text-align:center;font-weight:700">✅ DONE</td></tr>`;return}
+const h80=d.mc.d80&&d.mc.d80<=TARGET;
+mcHTML+=`<tr><td style="font-weight:700;color:var(--t1)">${d.ic} ${d.n}</td>
+<td class="mono" style="color:var(--ac)">${d.rate.toFixed(1)}/wk</td>
+<td class="mono" style="color:var(--yl);font-weight:700">${fmtD(d.mc.d50)}</td>
+<td class="mono" style="font-weight:800;color:${h80?'var(--gn)':'var(--rd)'};background:${h80?'var(--gnBg)':'var(--rdBg)'};border-radius:3px">${fmtD(d.mc.d80)}</td>
+<td class="mono" style="color:var(--rd)">${fmtD(d.mc.d95)}</td>
+<td class="mono">${d.mc.min}w</td><td class="mono">${d.mc.max}w</td>
+<td>${h80?'✅ P80':'❌'}</td></tr>`;});
+mcHTML+=`</tbody></table></div>`;
+
+// Forecast chart with prediction intervals (Committee 4 #3)
+mcHTML+=`<div class="cd" style="margin-bottom:8px"><div style="position:relative;height:200px"><canvas id="mcChart"></canvas></div></div>`;
+
+// Forecast Accuracy (Committee 4 #2)
+const fcAcc=calcFcAccuracy();
+let accHTML="";
+if(fcAcc.length){
+accHTML=`<div class="sec"><h2>🎯 Forecast Accuracy</h2><div class="tg">How accurate were past predictions?</div></div>
+<div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th><th>Package</th><th>Predicted</th><th>Actual</th><th>Error</th><th>Accurate?</th></tr></thead><tbody>`;
+fcAcc.slice(-10).forEach(f=>{accHTML+=`<tr><td>${f.date}</td><td>${f.pkg}</td><td class="mono">${f.predicted}</td><td class="mono">${f.actual}</td><td class="mono" style="color:${f.error<20?'var(--gn)':'var(--rd)'}">${f.error}%</td><td>${f.accurate?'✅':'❌'}</td></tr>`});
+accHTML+=`</tbody></table></div>`;}
+
+document.getElementById("p_forecast").innerHTML=`${sliderHTML}${mcHTML}${accHTML}`;
+
+setTimeout(()=>{const ctx=document.getElementById("mcChart");if(!ctx)return;if(charts.mcC)charts.mcC.destroy();
+const fA=an.filter(d=>d.rem>0);
+charts.mcC=new Chart(ctx,{type:"bar",data:{labels:fA.map(d=>d.ic+" "+d.n),datasets:[
+{label:"P50",data:fA.map(d=>d.mc.p50),backgroundColor:"rgba(196,127,10,.4)",borderRadius:3},
+{label:"P80",data:fA.map(d=>d.mc.p80),backgroundColor:"rgba(196,51,34,.3)",borderRadius:3},
+{label:"P95",data:fA.map(d=>d.mc.p95),backgroundColor:"rgba(196,51,34,.15)",borderRadius:3}
+]},options:{indexAxis:"y",scales:{x:{title:{display:true,text:"Weeks from today",color:"#8a7f6e",font:{size:9}},ticks:{color:"#8a7f6e",font:{size:8}},grid:{color:"#efece7"}},y:{ticks:{color:"#2c2416",font:{size:9}},grid:{display:false}}},plugins:{legend:{labels:{color:"#5a5040",font:{size:9}}},tooltip:{backgroundColor:'#faf8f5',titleColor:'#2c2416',bodyColor:'#5a5040',borderColor:'#d8d4cc',borderWidth:1}},responsive:true,maintainAspectRatio:false}});},80);
+}
+function applyScenario(s){
+if(s==="reset")ACTS.forEach(a=>scnRates[a.n]=0);
+if(s==="add2crews")scnRates["Pool"]=60;
+if(s==="allplus30")ACTS.forEach(a=>scnRates[a.n]=30);
+if(s==="focusHO"){scnRates["Handover"]=80;scnRates["Utility Pipes"]=40}
+if(s==="loseZone")ACTS.forEach(a=>scnRates[a.n]=Math.max(scnRates[a.n]-20,0));
+renderForecast();
+}
+
+// ============================================================
+// 3. SPC & FLOW (Committee 2 #1,#2,#8,#4,#11)
+// ============================================================
+function renderSPC(){
+const V=D.v,an=analyze(V);
+
+// SPC Charts per package
+let spcHTML=`<div class="sec"><h2>📊 Statistical Process Control</h2><div class="tg">UCL/LCL = ±3σ · Points outside = special cause · CV = Coefficient of Variation</div></div>`;
+let spcCards="";
+ACTS.forEach((a,ai)=>{
+const wg=WEEKLY_GAINS[a.n];
+if(!wg||wg.length<4)return;
+const spc=spcCalc(wg);if(!spc)return;
+const stab=stabilityIndex(wg.slice(-8));
+const trend=linReg(wg.slice(-8));
+spcCards+=`<div class="cd" style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<div style="font-size:12px;font-weight:700;color:var(--t1)">${a.ic} ${a.n}</div>
+<div style="display:flex;gap:8px;font-size:9px">
+<span style="color:var(--ac)">Mean: <b class="mono">${spc.mean.toFixed(1)}</b></span>
+<span style="color:var(--gn)">UCL: <b class="mono">${spc.ucl.toFixed(1)}</b></span>
+<span style="color:var(--rd)">LCL: <b class="mono">${spc.lcl.toFixed(1)}</b></span>
+<span style="color:var(--pp)">CV: <b class="mono">${(spc.cv*100).toFixed(0)}%</b></span>
+<span>${stab.stability}</span>
+<span style="color:${trend.slope>=0?'var(--gn)':'var(--rd)'}">Trend: ${trend.slope>=0?'↑':'↓'} ${Math.abs(trend.slope).toFixed(2)}/wk</span>
+</div></div>
+<div style="position:relative;height:120px"><canvas id="spc_${ai}"></canvas></div></div>`;
+});
+
+// CFD - Cumulative Flow Diagram (Committee 2 #8)
+let cfdHTML=`<div class="sec"><h2>📈 Cumulative Flow Diagram</h2><div class="tg">Shows work-in-progress accumulation over time. Widening bands = bottleneck</div></div>
+<div class="cd" style="margin-bottom:8px"><div style="position:relative;height:200px"><canvas id="cfdChart"></canvas></div></div>`;
+
+// Little's Law table (Committee 2 #2)
+let llHTML=`<div class="sec"><h2>⏱️ Little's Law — Throughput Analysis</h2><div class="tg">Lead Time = WIP ÷ Throughput. Lower lead time = faster flow.</div></div>
+<div class="cd" style="overflow-x:auto;margin-bottom:8px"><table class="tbl"><thead><tr><th>Package</th><th>WIP</th><th>Throughput/wk</th><th>Lead Time (wks)</th><th>Flow Health</th></tr></thead><tbody>`;
+an.forEach(d=>{
+const fh=d.ll.leadTime<5?"🟢 Fast":d.ll.leadTime<12?"🟡 Normal":"🔴 Slow";
+llHTML+=`<tr><td style="font-weight:700;color:var(--t1)">${d.ic} ${d.n}</td>
+<td class="mono" style="color:var(--yl)">${d.ll.wip}</td>
+<td class="mono" style="color:var(--ac)">${d.ll.throughput.toFixed(1)}</td>
+<td class="mono" style="font-weight:800;color:${d.ll.leadTime<5?'var(--gn)':d.ll.leadTime<12?'var(--yl)':'var(--rd)'}">${d.ll.leadTime}w</td>
+<td style="font-size:9px">${fh}</td></tr>`;});
+llHTML+=`</tbody></table></div>`;
+
+// Variation table
+let varHTML=`<div class="sec"><h2>📐 Rate Variation Analysis</h2></div>
+<div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Package</th><th>Mean Rate</th><th>Std Dev</th><th>CV</th><th>Stability</th><th>Trend</th><th>R²</th></tr></thead><tbody>`;
+an.forEach(d=>{
+if(!d.spcData)return;
+varHTML+=`<tr><td style="font-weight:700;color:var(--t1)">${d.ic} ${d.n}</td>
+<td class="mono">${d.spcData.mean.toFixed(1)}</td>
+<td class="mono">${d.spcData.stdDev.toFixed(1)}</td>
+<td class="mono" style="color:${d.stab.cv<0.3?'var(--gn)':d.stab.cv<0.6?'var(--yl)':'var(--rd)'}">${(d.stab.cv*100).toFixed(0)}%</td>
+<td style="font-size:9px">${d.stab.stability}</td>
+<td class="mono" style="color:${d.trend.slope>=0?'var(--gn)':'var(--rd)'}">${d.trend.slope>=0?'+':''}${d.trend.slope.toFixed(2)}</td>
+<td class="mono">${d.trend.r2.toFixed(2)}</td></tr>`;});
+varHTML+=`</tbody></table></div>`;
+
+document.getElementById("p_spc").innerHTML=`${spcHTML}${spcCards}${cfdHTML}${llHTML}${varHTML}`;
+
+// Render SPC charts — FIX B: Use live gains data when available
+setTimeout(()=>{
+const liveRates=computeLiveRates();
+ACTS.forEach((a,ai)=>{
+const ctx=document.getElementById("spc_"+ai);if(!ctx)return;
+if(charts["spc_"+ai])charts["spc_"+ai].destroy();
+// FIX V7.1: Only use live data for SPC when 5+ gain points (otherwise hardcoded is richer)
+const liveD=liveRates&&liveRates[a.n]&&liveRates[a.n].n>=5?liveRates[a.n]:null;
+const wg=liveD?liveD.gains:(WEEKLY_GAINS[a.n]||[]);
+if(!wg.length)return;
+const spc=spcCalc(wg);if(!spc)return;
+const labels=wg.map((v,i)=>"W"+(i+1));
+charts["spc_"+ai]=new Chart(ctx,{type:"line",data:{labels,datasets:[
+{label:"Output",data:wg,borderColor:CAT_C[a.n],backgroundColor:"transparent",borderWidth:1.5,pointRadius:2,pointBackgroundColor:wg.map(v=>v>spc.ucl||v<spc.lcl?"#c43322":CAT_C[a.n]),tension:.1},
+{label:"Mean",data:Array(wg.length).fill(spc.mean),borderColor:"#1a73a7",borderWidth:1,borderDash:[3,3],pointRadius:0},
+{label:"UCL",data:Array(wg.length).fill(spc.ucl),borderColor:"rgba(196,51,34,.4)",borderWidth:1,borderDash:[2,2],pointRadius:0},
+{label:"LCL",data:Array(wg.length).fill(spc.lcl),borderColor:"rgba(196,51,34,.4)",borderWidth:1,borderDash:[2,2],pointRadius:0}
+]},options:{scales:{x:{ticks:{color:"#8a7f6e",font:{size:7}},grid:{display:false}},y:{ticks:{color:"#8a7f6e",font:{size:8}},grid:{color:"#efece7"}}},plugins:{legend:{labels:{color:"#5a5040",font:{size:8},usePointStyle:true}}},responsive:true,maintainAspectRatio:false}});
+});
+// CFD — FIX C: Use live cumulative data when available
+const cfdCtx=document.getElementById("cfdChart");if(cfdCtx){if(charts.cfd)charts.cfd.destroy();
+const liveSC=buildLiveSCurve();
+let cfdLabels,cfdDS;
+if(liveSC&&liveSC.labels.length>=8){
+  cfdLabels=liveSC.labels;
+  cfdDS=ACTS.filter(a=>liveSC.datasets[a.n]&&liveSC.datasets[a.n].some(v=>v>0)).map((a,i)=>{
+    return{label:a.n,data:liveSC.datasets[a.n],borderColor:Object.values(CAT_C)[i]||"#888",backgroundColor:Object.values(CAT_C).map(c=>c+"18")[i]||"rgba(0,0,0,.05)",borderWidth:1.5,pointRadius:0,fill:true,tension:.3};
+  });
+}else{
+  cfdLabels=SCURVE_L;
+  cfdDS=ACTS.slice(0,4).map((a,i)=>({label:a.n,data:SCURVE[a.n]||[],borderColor:["#2980b9","#27ae60","#e67e22","#8e44ad"][i],backgroundColor:["rgba(41,128,185,.1)","rgba(39,174,96,.1)","rgba(230,126,34,.1)","rgba(142,68,173,.1)"][i],borderWidth:1.5,pointRadius:0,fill:true,tension:.3}));
+}
+charts.cfd=new Chart(cfdCtx,{type:"line",data:{labels:cfdLabels,datasets:cfdDS},options:{scales:{x:{ticks:{color:"#8a7f6e",font:{size:7}},grid:{display:false}},y:{ticks:{color:"#8a7f6e",font:{size:8}},grid:{color:"#efece7"},stacked:false}},plugins:{legend:{labels:{color:"#5a5040",font:{size:8},usePointStyle:true}}},responsive:true,maintainAspectRatio:false}});}
+},100);
+}
+
+// ============================================================
+// 4. BALANCE (Pipeline + Pareto + Correlation)
+// ============================================================
+function renderBalance(){
+const V=D.v,an=analyze(V);
+let balHTML="";
+an.forEach(d=>{if(d.pipe.length<=1)return;
+const f=d.pipe[0],l=d.pipe[d.pipe.length-1];
+const wip=f.d-l.d;const ratio=f.d>0?l.d/f.d:0;const h=ratio>=0.8?"var(--gn)":ratio>=0.5?"var(--yl)":"var(--rd)";
+balHTML+=`<div class="cd" style="margin-bottom:8px;padding:14px 16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--c3);padding-bottom:8px">
+<div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">${d.ic}</span><span style="font-size:14px;font-weight:800;color:var(--t1)">${d.n}</span></div>
+<div style="display:flex;gap:10px;font-size:10px">
+<span style="color:var(--ac)">Start: <b class="mono">${f.d}</b></span>
+<span style="color:var(--gn)">Finish: <b class="mono">${l.d}</b></span>
+<span style="color:var(--yl)">WIP: <b class="mono">${wip}</b></span>
+<span class="mono" style="font-weight:900;color:${h};font-size:11px">Ratio: ${(ratio*100).toFixed(0)}%</span>
+</div></div>
+<div style="display:flex;gap:6px;align-items:end">`;
+d.pipe.forEach((p,pi)=>{
+const bc=p.n===d.bn.n?"var(--rd)":p.n===d.ld.n?"var(--gn)":"var(--ac)";
+const barH=Math.max(20,p.p*60);
+balHTML+=`<div style="flex:1;text-align:center">
+<div class="mono" style="font-size:11px;font-weight:800;color:${bc};margin-bottom:3px">${(p.p*100).toFixed(0)}%</div>
+<div style="height:60px;background:var(--c3);border-radius:4px;overflow:hidden;display:flex;flex-direction:column-reverse">
+<div style="height:${p.p*100}%;background:${bc};opacity:.55;border-radius:4px"></div>
+</div>
+<div style="font-size:10px;font-weight:600;color:var(--t1);margin-top:4px">${p.n}</div>
+<div class="mono" style="font-size:9px;color:var(--t3)">${p.d} done</div>
+</div>`;
+if(pi<d.pipe.length-1){
+const cr=d.convRatios[pi];
+const cc=cr>=0.7?'var(--gn)':cr>=0.4?'var(--yl)':'var(--rd)';
+balHTML+=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 2px;margin-bottom:10px">
+<div class="mono" style="font-size:10px;font-weight:800;color:${cc}">${(cr*100).toFixed(0)}%</div>
+<div style="font-size:12px;color:${cc}">→</div>
+</div>`}
+});
+balHTML+=`</div></div>`;});
+
+// Pareto (Committee 2 #9)
+let paretoHTML=`<div class="sec"><h2>📊 Pareto — Delay Contribution</h2><div class="tg">Which packages contribute most to schedule delay?</div></div>`;
+const sorted=an.filter(a=>a.delayW>0).sort((a,b)=>b.delayW*b.w-a.delayW*a.w);
+const totalDelay=sorted.reduce((s,a)=>s+a.delayW*a.w,0);
+let cumPct=0;
+paretoHTML+=`<div class="cd" style="padding:10px">`;
+sorted.forEach(a=>{
+const contrib=totalDelay>0?(a.delayW*a.w/totalDelay*100):0;
+cumPct+=contrib;
+paretoHTML+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+<div style="width:90px;font-size:10px;font-weight:700;color:var(--t1)">${a.ic} ${a.n}</div>
+<div style="flex:1;height:16px;background:var(--c3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${contrib}%;background:${CAT_C[a.n]};border-radius:3px;opacity:.7"></div></div>
+<div class="mono" style="width:35px;font-size:10px;font-weight:700;color:var(--t1)">${contrib.toFixed(0)}%</div>
+<div class="mono" style="width:35px;font-size:9px;color:var(--t3)">${cumPct.toFixed(0)}%</div>
+</div>`;});
+paretoHTML+=`</div>`;
+
+// Correlation Matrix (Committee 2 #12)
+const corr=correlationMatrix();
+let corrHTML=`<div class="sec"><h2>🔗 Package Correlation Matrix</h2><div class="tg">High correlation = shared resources or dependencies</div></div>
+<div class="cd"><div style="display:grid;grid-template-columns:80px repeat(${ACTS.length},1fr);gap:2px">`;
+corrHTML+=`<div></div>`;ACTS.forEach(a=>corrHTML+=`<div style="font-size:7px;font-weight:700;color:var(--t1);text-align:center;padding:3px">${a.ic}</div>`);
+corr.forEach((row,i)=>{
+corrHTML+=`<div style="font-size:8px;font-weight:700;color:var(--t1);display:flex;align-items:center">${ACTS[i].ic} ${ACTS[i].n}</div>`;
+row.forEach((v,j)=>{
+const bg=i===j?"var(--c2)":v>0.7?"var(--gnBg)":v>0.3?"var(--ylBg)":v<-0.3?"var(--rdBg)":"transparent";
+corrHTML+=`<div class="hm-cell" style="background:${bg};font-size:9px;color:var(--t1)">${i===j?'—':v.toFixed(1)}</div>`;
+});});
+corrHTML+=`</div></div>`;
+
+document.getElementById("p_balance").innerHTML=`<div class="sec"><h2>🔧 Stage Pipeline</h2><div class="tg">Conversion rates between stages · Red=bottleneck</div></div>${balHTML}${paretoHTML}${corrHTML}`;
+}
+
+// ============================================================
+// 5-12: REMAINING TABS (Handover, Zones, Constraints, Actions, Daily, Weekly, Ops, Compare)
+// ============================================================
+// 5. HANDOVER (from V5 improved)
+function renderHandover(){
+const V=D.v,T=V.length;
+const hoData=V.map(v=>{const ho=isHandoverReady(v);const ps=ACTS.map(a=>{const li2=a.ix[a.ix.length-1];return{n:a.n,ic:a.ic,done:v.a[li2]>=0.9,pct:Math.round(v.a[li2]*100)}});const dc=ps.filter(p=>p.done).length;const ms=ps.filter(p=>!p.done);let pend=0;v.a.forEach(x=>{if(x<0.9)pend++});let stage="Not Started";if(ho.ready)stage="✅ Handed Over";else if(ho.nearReady)stage="🏁 Near Ready";else if(dc>=4)stage="🔧 Almost";else if(dc>=2)stage="⚙️ Mid";else if(dc>=1||v.a.some(x=>x>0))stage="🚧 Early";return{v,ho,ps,dc,ms,pend,stage}});
+const fn={ho:hoData.filter(d=>d.stage==="✅ Handed Over").length,nr:hoData.filter(d=>d.stage==="🏁 Near Ready").length,al:hoData.filter(d=>d.stage==="🔧 Almost").length,md:hoData.filter(d=>d.stage==="⚙️ Mid").length,ew:hoData.filter(d=>d.stage==="🚧 Early").length,ns:hoData.filter(d=>d.stage==="Not Started").length};
+const bMap={};hoData.filter(d=>!d.ho.ready).forEach(d=>{d.ms.forEach(m=>{if(!bMap[m.n])bMap[m.n]=0;bMap[m.n]++})});
+const blockers=Object.entries(bMap).sort((a,b)=>b[1]-a[1]);
+let bHTML=blockers.map(([p,c])=>{const a=ACTS.find(x=>x.n===p);return`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:80px;font-size:9px;font-weight:700;color:var(--t1)">${a?a.ic:''} ${p}</div><div style="flex:1;height:14px;background:var(--c3);border-radius:3px;overflow:hidden"><div style="height:100%;width:${(c/T*100)}%;background:${CAT_C[p]||'#888'};border-radius:3px;opacity:.7"></div></div><div class="mono" style="width:30px;font-size:10px;font-weight:800;color:${CAT_C[p]||'#888'}">${c}</div></div>`}).join("");
+const pv=hoData.filter(d=>!d.ho.ready&&d.dc>=3).sort((a,b)=>a.pend-b.pend);
+let pvHTML=pv.slice(0,15).map(d=>{const dots=d.ps.map(p=>`<span style="color:${p.done?'var(--gn)':'var(--rd)'};font-size:8px">${p.done?'✓':p.pct+'%'}</span>`).join(" ");return`<div class="cd" style="padding:6px 10px;margin-bottom:3px;border-left:2px solid ${d.pend<=3?'var(--gn)':'var(--yl)'}"><div style="display:flex;justify-content:space-between;font-size:10px"><div><b class="mono" style="color:var(--t1)">${d.v.id}</b> <span style="color:var(--t3);font-size:8px">${CN[d.v.cm]} Z${d.v.z}</span> ${dots}</div><div style="color:var(--yl);font-size:9px">${d.pend} pending</div></div></div>`}).join("");
+const hr2=fn.ho;
+// V7.1 FIX: ALL forecast dates come from analyze() — SINGLE SOURCE OF TRUTH
+// Previous bug: Handover tab used fn.ho (strict definition) for remaining,
+// but analyze() used gs(V,18).d (just index 18). Different numbers = different dates.
+const hoAn=analyze(V);
+const hoActData=hoAn.find(a=>a.n==="Handover");
+const hoRate=hoActData?hoActData.rate:0;
+const hoRem=hoActData?hoActData.rem:(T-hr2);
+const hoReq=WLEFT>0?hoRem/WLEFT:999;
+// USE analyze()'s forecast date directly — NOT recalculated
+const hoFcDate2=hoActData?hoActData.fd:fcDate(hoRem,hoRate);
+const funnelData=[{l:"Not Started",v:fn.ns,c:"var(--t4)"},{l:"Early",v:fn.ew,c:"var(--rd)"},{l:"Mid",v:fn.md,c:"var(--yl)"},{l:"Almost",v:fn.al,c:"var(--og)"},{l:"Near Ready",v:fn.nr,c:"#4ade80"},{l:"Done",v:fn.ho,c:"var(--gn)"}];
+let funnelHTML=funnelData.map(s=>`<div style="flex:1;text-align:center"><div class="mono" style="font-size:12px;font-weight:900;color:${s.c}">${s.v}</div><div style="height:${T?Math.max(6,s.v/T*80):6}px;background:${gi(s.v/T*100,"gn")};border:1px solid ${s.c};border-radius:3px"></div><div style="font-size:7px;color:var(--t3);margin-top:2px">${s.l}</div></div>`).join('<div style="color:var(--bd);font-size:8px;margin-bottom:25px">→</div>');
+document.getElementById("p_handover").innerHTML=`
+<div class="cd gl-b" style="margin-bottom:8px;padding:10px 14px"><div style="font-size:12px;font-weight:800;color:var(--t1)">🏁 North Star: Handover-Ready Villas / Week</div><div style="font-size:9px;color:var(--t3)">A villa is handover-ready when all civil works + utilities complete + inspections + handover closed.</div></div>
+<div class="grid g6" style="margin-bottom:8px">
+<div class="cd kpi gl-g"><div class="lbl">Done</div><div class="val" style="color:var(--gn)">${fn.ho}</div></div>
+<div class="cd kpi"><div class="lbl">Near Ready</div><div class="val" style="color:#16a34a">${fn.nr}</div></div>
+<div class="cd kpi gl-y"><div class="lbl">Almost</div><div class="val" style="color:var(--yl)">${fn.al}</div></div>
+<div class="cd kpi"><div class="lbl">Rate/wk</div><div class="val" style="color:var(--ac)">${hoRate.toFixed(1)}</div></div>
+<div class="cd kpi ${hoReq>hoRate*1.5?'gl-r':''}"><div class="lbl">Required</div><div class="val" style="color:${hoReq>hoRate*1.5?'var(--rd)':'var(--yl)'}">${hoReq.toFixed(1)}</div></div>
+<div class="cd kpi"><div class="lbl">Forecast</div><div class="val" style="font-size:14px;color:${hoFcDate2&&hoFcDate2<=TARGET?'var(--gn)':'var(--rd)'}">${fmtD(hoFcDate2)}</div></div>
+</div>
+<div class="sec"><h2>📊 Funnel</h2></div><div class="cd" style="margin-bottom:8px;padding:10px"><div style="display:flex;gap:3px;align-items:end;height:90px">${funnelHTML}</div></div>
+<div class="grid g2" style="margin-bottom:8px"><div><div class="sec"><h2>🚧 Blockers</h2></div><div class="cd" style="padding:10px">${bHTML}</div></div><div><div class="sec"><h2>🎯 Priority</h2><div class="tg">${pv.length} villas with 3+ pkgs done</div></div>${pvHTML}</div></div>`;
+}
+
+// 6. ZONES
+function renderZones(){const V=D.v;const za=zoneAnalysis(V);let zHTML="";za.forEach(z=>{zHTML+=`<tr><td style="font-weight:700;color:var(--t1)">${z.l}</td><td class="mono">${z.total}</td><td class="mono" style="color:var(--gn)">${z.done}</td><td class="mono" style="color:var(--yl)">${z.active}</td><td class="mono" style="color:var(--rd)">${z.ns}</td><td class="mono" style="color:var(--cy)">${z.nf}</td><td class="mono" style="color:var(--gn)">${z.hr}</td><td class="mono" style="font-weight:800;color:var(--ac)">${z.wp}%</td><td class="mono" style="color:${z.mxD>8?'var(--rd)':z.mxD>3?'var(--yl)':'var(--gn)'}">${z.mxD}w</td><td class="mono" style="color:var(--og)">${z.zC}</td></tr>`});
+document.getElementById("p_zones").innerHTML=`<div class="sec"><h2>🗺️ Zone Matrix</h2></div><div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Zone</th><th>Total</th><th>Done</th><th>Active</th><th>N/S</th><th>Near</th><th>HO</th><th>Progress</th><th>Max Delay</th><th>Constraints</th></tr></thead><tbody>${zHTML}</tbody></table></div>`;}
+
+// 7. CONSTRAINTS
+function renderConstraints(){const cons=D.constraints||[];const open=cons.filter(c=>c.status!=="Resolved");let tHTML="";open.forEach((c,i)=>{const age=GOV.ageDays(c.identified?.split?.('T')?.[0]||c.identified);const od=c.due&&GOV.fromISO(c.due)<GOV.now();tHTML+=`<tr><td class="mono">#${i+1}</td><td style="font-weight:700;color:var(--t1)">${c.villa||'—'}</td><td>${c.pkg}</td><td><span class="rb ${c.type==='Access'||c.type==='Material'?'rb-h':'rb-m'}">${c.type}</span></td><td style="font-size:9px;max-width:150px">${c.desc}</td><td style="font-size:9px">${c.owner||'—'}</td><td class="mono" style="color:${age>14?'var(--rd)':age>7?'var(--yl)':'var(--t2)'}">${age}d</td><td class="mono" style="color:var(--og)">${c.impact||0}d</td><td>${od?'<span class="rb rb-h">OVERDUE</span>':'<span class="rb rb-l">OPEN</span>'}</td><td><button class="abtn" style="font-size:8px;padding:2px 6px" onclick="resolveConstraint(${cons.indexOf(c)})">✅</button></td></tr>`});
+document.getElementById("p_constraints").innerHTML=`<div class="grid g3" style="margin-bottom:8px"><div class="cd kpi"><div class="lbl">Open</div><div class="val" style="color:var(--rd)">${open.length}</div></div><div class="cd kpi"><div class="lbl">Resolved</div><div class="val" style="color:var(--gn)">${cons.filter(c=>c.status==="Resolved").length}</div></div><div class="cd kpi"><div class="lbl">Total Impact</div><div class="val" style="color:var(--og)">${open.reduce((s,c)=>s+(c.impact||0),0)}d</div></div></div>
+${open.length?`<div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>#</th><th>Villa</th><th>Pkg</th><th>Type</th><th>Desc</th><th>Owner</th><th>Age</th><th>Impact</th><th>Status</th><th></th></tr></thead><tbody>${tHTML}</tbody></table></div>`:'<div class="cd" style="text-align:center;padding:16px;color:var(--t3)">No open constraints</div>'}`;}
+
+// 8. ACTIONS + LEADING INDICATORS
+function renderActions(){const V=D.v,an=analyze(V),actions=generateActions(V,an),li=leadingIndicators(V,an);
+let aHTML=actions.slice(0,12).map((a,i)=>{const pc=a.pri===1?'var(--rd)':'var(--yl)';return`<div class="cd" style="display:flex;gap:8px;padding:8px 10px;margin-bottom:4px;border-left:3px solid ${pc}"><div class="mono" style="width:22px;height:22px;border-radius:5px;background:${a.pri===1?'var(--rdBg)':'var(--ylBg)'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${pc}">${i+1}</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--t1)">${a.t}</div><div style="font-size:9px;color:var(--t3)">${a.d}</div></div></div>`}).join("");
+// PPC button
+let ppcBtn=`<div style="margin-top:8px"><button class="abtn abtn-f" onclick="showPPC()">📋 Set Weekly PPC Plan</button></div>`;
+const ppcData=calcPPC();
+let ppcHTML="";if(ppcData.length){ppcHTML=`<div class="sec"><h2>📋 PPC History</h2><div class="tg">Percent Plan Complete — Last Planner System</div></div><div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Week</th><th>Planned</th><th>Actual</th><th>PPC</th></tr></thead><tbody>`;ppcData.forEach(p=>{ppcHTML+=`<tr><td>${p.week}</td><td class="mono">${p.planned}</td><td class="mono">${p.actual}</td><td class="mono" style="font-weight:800;color:${p.ppc>=80?'var(--gn)':p.ppc>=60?'var(--yl)':'var(--rd)'}">${p.ppc}%</td></tr>`});ppcHTML+=`</tbody></table></div>`;}
+document.getElementById("p_actions").innerHTML=`<div class="cd gl-b" style="margin-bottom:8px;padding:10px"><div style="font-size:13px;font-weight:800;color:var(--t1)">⚡ ${actions.length} Actions Required</div><div style="font-size:9px;color:var(--t3)">Auto-generated from risk, constraints, trend decline, and handover readiness.</div></div>${aHTML}${ppcBtn}${ppcHTML}`;}
+
+// 9. DAILY
+function renderDaily(){const hist=D.hist||{daily:[],weekly:[]};const daily=hist.daily||[];const V=D.v;const today=daily.length?daily[daily.length-1]:null;const yesterday=daily.length>1?daily[daily.length-2]:null;
+if(!today){document.getElementById("p_daily").innerHTML=`<div class="cd" style="padding:24px;text-align:center"><div style="font-size:30px;margin-bottom:6px">📅</div><div style="font-size:13px;font-weight:700;color:var(--t1)">No Daily Data</div><div style="font-size:10px;color:var(--t3)">Upload Excel → auto-saves daily record.</div><button class="abtn abtn-f" style="margin-top:8px" onclick="showUpload()">📂 Upload</button></div>`;return}
+let kpi="",changes="",alerts="";
+if(yesterday){const tS=today.stats,yS=yesterday.stats;const tg=tS.actDone.reduce((s,v,i)=>s+(v-(yS.actDone[i]||0)),0);const od=(tS.overall-yS.overall).toFixed(2);
+let al=[];ALL_SUBS.forEach((sub,i)=>{const td=tS.actDone[i]||0,yd=yS.actDone[i]||0;if(td===yd&&td<D.v.length&&td>0)al.push(sub)});
+alerts=al.length?`<div class="sec"><h2>🚨 Alerts</h2></div><div class="grid g2" style="margin-bottom:8px">${al.slice(0,4).map(a=>`<div class="cd gl-r" style="padding:6px 10px;font-size:10px"><b>${a.n}</b> — stalled at ${gs(D.v,a.ai).d}/162</div>`).join("")}</div>`:'<div class="cd gl-g" style="padding:8px 12px;margin-bottom:8px;font-size:10px;color:var(--gn)">✅ All active activities progressed</div>';
+let ac="";ACTS.forEach(act=>{const gains=[];act.ix.forEach((idx,si)=>{const g=(tS.actDone[idx]||0)-(yS.actDone[idx]||0);if(g!==0)gains.push({sub:act.su[si],g})});if(!gains.length)return;ac+=`<div class="cd" style="border-left:3px solid ${CAT_C[act.n]};margin-bottom:3px;padding:6px 10px"><div style="display:flex;justify-content:space-between"><div style="font-size:11px;font-weight:700;color:var(--t1)">${act.ic} ${act.n}</div><div class="mono" style="color:var(--gn);font-weight:900">+${gains.reduce((s,g)=>s+g.g,0)}</div></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px">${gains.map(g=>`<span style="background:var(--c2);padding:2px 6px;border-radius:3px;font-size:9px">${g.sub} <b class="mono" style="color:var(--gn)">+${g.g}</b></span>`).join("")}</div></div>`});
+kpi=`<div class="grid g3" style="margin-bottom:8px"><div class="cd kpi"><div class="lbl">Δ Progress</div><div class="val" style="color:${+od>0?'var(--gn)':'var(--rd)'}">+${od}%</div></div><div class="cd kpi gl-g"><div class="lbl">Completed</div><div class="val" style="color:var(--gn)">+${tg}</div></div><div class="cd kpi"><div class="lbl">Overall</div><div class="val" style="color:var(--ac)">${tS.overall}%</div><div class="sub">was ${yS.overall}%</div></div></div>`;
+changes=ac?`<div class="sec"><h2>🔍 Changes</h2></div>${ac}`:'';}
+else{kpi=`<div class="cd" style="padding:10px;text-align:center;margin-bottom:8px;font-size:11px">📅 First record: ${today.date} · <b style="color:var(--ac)">${today.stats.overall}%</b></div>`}
+let chHTML="";if(daily.length>=3)chHTML=`<div class="sec"><h2>📈 Trend</h2></div><div class="cd"><div style="position:relative;height:150px"><canvas id="dTC"></canvas></div></div>`;
+document.getElementById("p_daily").innerHTML=`${kpi}${alerts}${changes}${chHTML}`;
+if(daily.length>=3){setTimeout(()=>{const ctx=document.getElementById("dTC");if(!ctx)return;if(charts.dt)charts.dt.destroy();const sl=daily.slice(-14);const gn=sl.map((d,i)=>{if(!i)return 0;const p=sl[i-1];return d.stats.actDone.reduce((s,v,j)=>s+(v-(p.stats.actDone[j]||0)),0)});charts.dt=new Chart(ctx,{type:"bar",data:{labels:sl.map(d=>d.date),datasets:[{data:gn,backgroundColor:gn.map(g=>g>5?"rgba(26,138,92,.5)":g>0?"rgba(196,127,10,.4)":"rgba(196,51,34,.3)"),borderRadius:3}]},options:{scales:{x:{ticks:{color:"#8a7f6e",font:{size:7}},grid:{display:false}},y:{ticks:{color:"#8a7f6e",font:{size:8}},grid:{color:"#efece7"}}},plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});},80)}
+}
+
+// 10. WEEKLY
+function renderWeekly(){const hist=D.hist||{daily:[],weekly:[]};const daily=hist.daily||[];const weekly=hist.weekly||[];
+let wHTML="";if(weekly.length){wHTML=`<div class="sec"><h2>📊 Weekly</h2></div><div class="cd" style="overflow-x:auto;margin-bottom:8px"><table class="tbl"><thead><tr><th>Week</th><th>Period</th><th>Gain</th><th>Δ%</th>`;ACTS.forEach(a=>wHTML+=`<th>${a.ic}</th>`);wHTML+=`</tr></thead><tbody>`;weekly.slice().reverse().forEach(w=>{wHTML+=`<tr><td style="font-weight:700">${w.week}</td><td style="font-size:8px;color:var(--t3)">${w.start}→${w.end}</td><td class="mono" style="color:var(--gn)">+${w.totalGain}</td><td class="mono" style="color:${w.overallDelta>0?'var(--gn)':'var(--rd)'}">+${w.overallDelta}%</td>`;ACTS.forEach((a,ai)=>{const g=w.catGains?w.catGains[ai]:0;wHTML+=`<td class="mono" style="color:${g>0?'var(--gn)':'var(--t3)'}">${g>0?'+':''}${g}</td>`});wHTML+=`</tr>`});wHTML+=`</tbody></table></div>`}
+let tHTML="";if(daily.length>=3)tHTML=`<div class="cd" style="margin-bottom:8px"><div style="position:relative;height:150px"><canvas id="oTC"></canvas></div></div>`;
+let dLog="";if(daily.length){dLog=`<div class="sec"><h2>📋 Log</h2></div><div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th><th>%</th>`;ACTS.forEach(a=>dLog+=`<th>${a.ic}</th>`);dLog+=`<th>+</th></tr></thead><tbody>`;daily.slice().reverse().slice(0,20).forEach((d,ri)=>{const pi=daily.length-2-ri;const pv2=pi>=0?daily[pi]:null;const g=pv2?d.stats.actDone.reduce((s,v,i)=>s+(v-(pv2.stats.actDone[i]||0)),0):'-';dLog+=`<tr><td style="font-weight:700">${d.date}</td><td class="mono" style="color:var(--ac)">${d.stats.overall}%</td>`;ACTS.forEach(a=>{dLog+=`<td class="mono">${d.stats.actDone[a.ix[a.ix.length-1]]||0}</td>`});dLog+=`<td class="mono" style="color:${g>0?'var(--gn)':'var(--t3)'}">${g!=='-'?(g>0?'+':'')+g:'-'}</td></tr>`});dLog+=`</tbody></table></div>`}
+document.getElementById("p_weekly").innerHTML=`${tHTML}${wHTML}${dLog}`;
+if(daily.length>=3){setTimeout(()=>{const ctx=document.getElementById("oTC");if(!ctx)return;if(charts.ot)charts.ot.destroy();const sl=daily.slice(-30);charts.ot=new Chart(ctx,{type:"line",data:{labels:sl.map(d=>d.date),datasets:[{data:sl.map(d=>d.stats.overall),borderColor:"#1a73a7",backgroundColor:"rgba(26,115,167,.06)",borderWidth:2,pointRadius:2,fill:true,tension:.3}]},options:{scales:{x:{ticks:{color:"#8a7f6e",font:{size:7}},grid:{display:false}},y:{ticks:{color:"#8a7f6e",font:{size:8}},grid:{color:"#efece7"}}},plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});},80)}
+}
+
+// 11. OPERATIONS
+let GS={cf:"A",zf:"A",ai:0,q:"",sf:"A"}; // sf = status filter: A=All, D=Done, W=WIP, N=NotStarted, H=HOReady, F=NearFinish
+// Helper: estimate stage duration from historical data
+function avgStageDuration(actIdx){
+  // Estimate average weeks a stage takes based on how many are done vs elapsed time
+  const s=gs(D.v,actIdx);
+  if(s.d<5)return WELAPSED; // not enough data
+  return +(WELAPSED*0.7).toFixed(1); // rough estimate
+}
+function villaTooltipV6(v,ai){
+  const rd=villaReadiness(v);
+  const ho=isHandoverReady(v);
+  // Count done packages & subs
+  let donePkgs=0,totalPkgs=ACTS.length,doneSubs=0,totalSubs=19,wipSubs=0;
+  v.a.forEach(x=>{if(x>=0.9)doneSubs++;else if(x>0)wipSubs++});
+  ACTS.forEach(a=>{const li=a.ix[a.ix.length-1];if(v.a[li]>=0.9)donePkgs++});
+  // Constraints on this villa
+  const vCons=D.constraints.filter(c=>c.villa===v.id&&c.status!=="Resolved");
+  // Build detailed stage info for the selected activity group
+  const ca=ACTS.find(a=>a.ix.includes(ai));
+  let stagesHTML="";
+  if(ca){
+    ca.su.forEach((sub,si)=>{
+      const ci=ca.ix[si];const cv=v.a[ci];
+      const cd=cv>=0.9,cw=cv>0&&cv<0.9,cns=cv<=0;
+      // Status label + color
+      let statusLabel,statusBg,statusColor;
+      if(cd){statusLabel="DONE";statusBg="var(--gnBg)";statusColor="var(--gn)"}
+      else if(cw){statusLabel=Math.round(cv*100)+"%";statusBg="var(--ylBg)";statusColor="var(--yl)"}
+      else{statusLabel="NOT STARTED";statusBg="var(--rdBg)";statusColor="var(--rd)"}
+      // Prediction logic
+      let prediction="";
+      if(cns){
+        // Not started: predict start based on predecessor
+        if(si>0){
+          const prevVal=v.a[ca.ix[si-1]];
+          if(prevVal>=0.9)prediction=`<div style="font-size:7px;color:var(--ac)">🔮 Ready to start — predecessor done</div>`;
+          else if(prevVal>0)prediction=`<div style="font-size:7px;color:var(--yl)">⏳ Waiting — predecessor at ${Math.round(prevVal*100)}%</div>`;
+          else prediction=`<div style="font-size:7px;color:var(--t4)">⏳ Blocked — predecessor not started</div>`;
+        }else{
+          prediction=`<div style="font-size:7px;color:var(--ac)">🔮 First stage — can start anytime</div>`;
+        }
+      }else if(cw){
+        // In progress: estimate completion
+        const avgDur=avgStageDuration(ci);
+        const estWeeksLeft=Math.max(1,Math.round(avgDur*(1-cv)));
+        prediction=`<div style="font-size:7px;color:var(--yl)">⏱️ ~${estWeeksLeft}w to complete at current pace</div>`;
+      }
+      stagesHTML+=`<div style="padding:3px 0;border-bottom:1px solid var(--c3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:9px;font-weight:600;color:var(--t1)">${sub}</span>
+          <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:${statusBg};color:${statusColor}">${statusLabel}</span>
+        </div>${prediction}</div>`;
+    });
+  }
+  // Package dots
+  const pkgDots=ACTS.map(a=>{const li=a.ix[a.ix.length-1];const done=v.a[li]>=0.9;const wip=v.a[li]>0&&v.a[li]<0.9;return`<span title="${a.n}" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:${done?'var(--gn)':wip?'var(--yl)':'var(--rd)'};margin-right:1px"></span>`}).join("");
+  // Handover status
+  let hoLabel;
+  if(ho.ready)hoLabel=`<span style="color:var(--gn);font-weight:700">✅ Handed Over</span>`;
+  else if(ho.nearReady)hoLabel=`<span style="color:#16a34a;font-weight:700">🏁 Near Ready</span>`;
+  else hoLabel=`<span style="color:var(--t3)">${donePkgs}/${totalPkgs} pkgs · ${totalSubs-doneSubs} subs pending</span>`;
+  // Constraint
+  let consHTML="";
+  if(vCons.length){consHTML=vCons.map(c=>`<div style="font-size:7px;color:var(--rd);margin-top:1px">🔗 ${c.type}: ${c.desc.slice(0,40)}${c.desc.length>40?'...':''} (${c.impact||0}d)</div>`).join("")}
+  // Next action
+  let nextAction="";
+  if(!ho.ready&&ca){
+    for(let si=0;si<ca.su.length;si++){
+      const ci=ca.ix[si];
+      if(v.a[ci]<0.9){
+        if(v.a[ci]>0)nextAction=`<div style="font-size:7px;color:var(--ac);margin-top:2px">▶ Next: Complete ${ca.su[si]} (at ${Math.round(v.a[ci]*100)}%)</div>`;
+        else if(si===0||v.a[ca.ix[si-1]]>=0.9)nextAction=`<div style="font-size:7px;color:var(--ac);margin-top:2px">▶ Next: Start ${ca.su[si]}</div>`;
+        break;
+      }
+    }
+  }
+  return`<div style="min-width:200px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-bottom:3px;border-bottom:2px solid var(--bd)">
+      <div><div style="font-size:12px;font-weight:800;color:var(--t1)">${v.id}</div><div style="font-size:8px;color:var(--t3)">${CN[v.cm]} · Zone ${v.z}</div></div>
+      <div style="text-align:right"><div style="font-size:8px;color:var(--t3)">Readiness</div><div class="mono" style="font-size:14px;font-weight:900;color:${rd>0.7?'var(--gn)':rd>0.4?'var(--yl)':'var(--rd)'}">${Math.round(rd*100)}%</div></div>
+    </div>
+    <div style="margin-bottom:3px">${pkgDots} <span style="font-size:7px;color:var(--t3)">${donePkgs}/${totalPkgs}</span></div>
+    <div style="font-size:8px;margin-bottom:3px">${hoLabel}</div>
+    ${stagesHTML}
+    ${consHTML}
+    ${nextAction}
+  </div>`;
+}
+
+function renderOps(){const V=D.v,ai=GS.ai;
+// Stage 1: Filter by COM/ZONE/QUERY only (for KPI counts)
+const fvBase=V.filter(v=>{
+if(GS.cf!=="A"&&v.cm!==GS.cf)return false;
+if(GS.zf!=="A"&&v.z!==+GS.zf)return false;
+if(GS.q&&!v.id.toLowerCase().includes(GS.q.toLowerCase()))return false;
+return true});
+// Stage 2: Apply status filter for villa display
+const fv=fvBase.filter(v=>{
+if(GS.sf==="D")return v.a[ai]>=0.9;
+if(GS.sf==="W")return v.a[ai]>0&&v.a[ai]<0.9;
+if(GS.sf==="N")return v.a[ai]<=0;
+if(GS.sf==="H")return isHandoverReady(v).ready;
+if(GS.sf==="F"){const pend=v.a.filter(x=>x<0.9).length;return pend>0&&pend<=3}
+return true});
+const s=gs(fvBase,ai);let sel="";ACTS.forEach(a=>{sel+=`<div style="display:flex;gap:2px;flex-wrap:wrap;align-items:center;margin-bottom:1px"><span style="font-size:7px">${a.ic}</span>`;a.su.forEach((sub,si)=>{const idx=a.ix[si];sel+=`<div class="fb ${idx===ai?'on':''}" onclick="GS.ai=${idx};GS.sf='A';renderOps()">${sub}</div>`});sel+=`</div>`});
+
+// ===== MINI DASHBOARD — KPI counts from fvBase (always show full counts) =====
+const selAct=ACTS.find(a=>a.ix.includes(ai));
+const fDone=fvBase.filter(v=>v.a[ai]>=0.9).length;
+const fWIP=fvBase.filter(v=>v.a[ai]>0&&v.a[ai]<0.9).length;
+const fNS=fvBase.filter(v=>v.a[ai]<=0).length;
+const fPct=fvBase.length?Math.round(wop(fvBase)*100):0;
+const fHO=fvBase.filter(v=>isHandoverReady(v).ready).length;
+const fNear=fvBase.filter(v=>isHandoverReady(v).nearReady).length;
+const fNearFinish=fvBase.filter(v=>{const pending=v.a.filter(x=>x<0.9).length;return pending>0&&pending<=3}).length;
+// Velocity: USE GLOBAL analyze(V) rate — SAME engine as Executive, Forecast, Banner
+const globalAn=analyze(D.v);
+const selActAn=selAct?globalAn.find(d=>d.n===selAct.n):null;
+const filteredRate=selActAn?Math.round(selActAn.rate*10)/10:0;
+// Remaining for SELECTED activity from GLOBAL data (consistent with other tabs)
+const selRemaining=selActAn?selActAn.rem:s.t-s.d;
+const filteredRemWeeks=filteredRate>0?Math.ceil(selRemaining/filteredRate):999;
+// Stage funnel for selected activity
+let funnelHTML="";
+if(selAct&&selAct.su.length>1){
+  funnelHTML=`<div style="display:flex;gap:3px;align-items:end;height:50px;margin-top:4px">`;
+  selAct.su.forEach((sub,si)=>{
+    const idx=selAct.ix[si];const ss=gs(fv,idx);
+    const p=fv.length?ss.d/fv.length:0;
+    const clr=CAT_C[selAct.n]||"var(--ac)";
+    funnelHTML+=`<div style="flex:1;text-align:center">
+    <div class="mono" style="font-size:10px;font-weight:800;color:${clr}">${ss.d}</div>
+    <div style="height:32px;background:var(--c3);border-radius:3px;overflow:hidden;display:flex;flex-direction:column-reverse"><div style="height:${p*100}%;background:${clr};opacity:.5;border-radius:3px"></div></div>
+    <div style="font-size:8px;color:var(--t3);margin-top:2px">${sub}</div></div>`;
+    if(si<selAct.su.length-1){const nd=selAct.ix[si+1];const ns=gs(fv,nd);const conv=ss.d>0?(ns.d/ss.d*100).toFixed(0):'—';funnelHTML+=`<div style="font-size:8px;color:var(--t3);margin-bottom:18px;font-weight:700">${conv}%→</div>`}
+  });
+  funnelHTML+=`</div>`;
+}
+// Worst 3 villas
+const worst3=fv.filter(v=>!v.a.every(x=>x>=0.9)&&v.a.some(x=>x>0)).sort((a,b)=>villaReadiness(a)-villaReadiness(b)).slice(0,3);
+let w3HTML=worst3.map(v=>{const rd=villaReadiness(v);const pend=v.a.filter(x=>x<0.9).length;return`<div style="display:flex;justify-content:space-between;font-size:9px;padding:2px 0;border-bottom:1px solid var(--c3)"><span class="mono" style="font-weight:700;color:var(--t1)">${v.id}</span><span style="color:var(--rd)">${pend} pending</span></div>`}).join("");
+// Progress distribution
+let dist=[0,0,0,0,0]; // 0%, 1-25%, 26-50%, 51-75%, 76-99%
+fv.forEach(v=>{const p=sop([v])*100;if(p<=0)dist[0]++;else if(p<=25)dist[1]++;else if(p<=50)dist[2]++;else if(p<=75)dist[3]++;else if(p<100)dist[4]++});
+
+// Donut SVG
+const dR=38,dC=2*Math.PI*dR;
+const dParts=[{v:fDone,c:"var(--gn)"},{v:fWIP,c:"var(--yl)"},{v:fNS,c:"var(--rd)"}];
+let dOffset=0;
+const donutArcs=dParts.map(p=>{const dash=fv.length?p.v/fv.length*dC:0;const svg=`<circle cx="48" cy="48" r="${dR}" fill="none" stroke="${p.c}" stroke-width="8" stroke-dasharray="${dash} ${dC-dash}" stroke-dashoffset="${-dOffset}" transform="rotate(-90 48 48)"/>`;dOffset+=dash;return svg}).join("");
+const donutSVG=`<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${dR}" fill="none" stroke="var(--c3)" stroke-width="8"/>${donutArcs}<text x="48" y="45" text-anchor="middle" fill="var(--t1)" font-size="18" font-weight="900" font-family="JetBrains Mono">${fPct}%</text><text x="48" y="58" text-anchor="middle" fill="var(--t3)" font-size="8">weighted</text></svg>`;
+
+// Additional filtered analytics
+const fReadiness=fv.length?Math.round(fv.reduce((s2,v2)=>s2+villaReadiness(v2),0)/fv.length*100):0;
+const fCons=D.constraints.filter(c=>c.status!=="Resolved"&&(c.pkg==="ALL"||!selAct||c.pkg===selAct.n)).length;
+// Forecast for SELECTED ACTIVITY completion (not overall villa completion)
+// Forecast: use GLOBAL analyze forecast directly — no recalculation
+const fFcDate=selActAn?selActAn.fd:null;
+const fOnTrack=fFcDate&&fFcDate<=TARGET;
+const fcLabel=selAct?selAct.n+" finish":"Completion";
+// Bottleneck for selected activity
+let bnName="—",bnPct=100;
+if(selAct&&selAct.su.length>1){
+  selAct.su.forEach((sub,si)=>{const idx=selAct.ix[si];const ss=gs(fv,idx);const p=fv.length?ss.d/fv.length*100:100;if(p<bnPct){bnPct=p;bnName=sub}});
+}
+// Progress sparkline from historical
+const histSpk=D.hist.daily.slice(-8).map(d=>d.stats.overall);
+// Full progress bar
+const progBar=`<div style="height:6px;background:var(--c3);border-radius:3px;overflow:hidden;display:flex"><div style="width:${fv.length?fDone/fv.length*100:0}%;background:var(--gn)"></div><div style="width:${fv.length?fWIP/fv.length*100:0}%;background:var(--yl)"></div></div>`;
+
+const miniDash=`<div class="cd" style="padding:10px 14px">
+<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+<div style="flex-shrink:0">${donutSVG}</div>
+<div style="display:flex;gap:6px;text-align:center">
+<div onclick="GS.sf=GS.sf==='D'?'A':'D';renderOps()" style="cursor:pointer;padding:4px 10px;border-radius:7px;border:2px solid ${GS.sf==='D'?'var(--gn)':'transparent'};background:${GS.sf==='D'?'var(--gnBg)':'transparent'};transition:all .15s" title="Filter: Done only"><div class="lbl">Done</div><div class="mono" style="font-size:22px;font-weight:900;color:var(--gn)">${fDone}</div></div>
+<div onclick="GS.sf=GS.sf==='W'?'A':'W';renderOps()" style="cursor:pointer;padding:4px 10px;border-radius:7px;border:2px solid ${GS.sf==='W'?'var(--yl)':'transparent'};background:${GS.sf==='W'?'var(--ylBg)':'transparent'};transition:all .15s" title="Filter: WIP only"><div class="lbl">WIP</div><div class="mono" style="font-size:22px;font-weight:900;color:var(--yl)">${fWIP}</div></div>
+<div onclick="GS.sf=GS.sf==='N'?'A':'N';renderOps()" style="cursor:pointer;padding:4px 10px;border-radius:7px;border:2px solid ${GS.sf==='N'?'var(--rd)':'transparent'};background:${GS.sf==='N'?'var(--rdBg)':'transparent'};transition:all .15s" title="Filter: Not Started only"><div class="lbl">N/S</div><div class="mono" style="font-size:22px;font-weight:900;color:var(--rd)">${fNS}</div></div>
+<div onclick="GS.sf=GS.sf==='H'?'A':'H';renderOps()" style="cursor:pointer;padding:4px 10px;border-radius:7px;border:2px solid ${GS.sf==='H'?'var(--cy)':'var(--c3)'};background:${GS.sf==='H'?'rgba(14,154,167,.1)':'var(--c2)'};transition:all .15s" title="Filter: Handover Ready only"><div class="lbl">HO Ready</div><div class="mono" style="font-size:22px;font-weight:900;color:var(--cy)">${fHO}</div></div>
+<div onclick="GS.sf=GS.sf==='F'?'A':'F';renderOps()" style="cursor:pointer;padding:4px 10px;border-radius:7px;border:2px solid ${GS.sf==='F'?'var(--pp)':'var(--c3)'};background:${GS.sf==='F'?'rgba(124,58,237,.08)':'var(--c2)'};transition:all .15s" title="Filter: Near Finish only"><div class="lbl">Near Fin</div><div class="mono" style="font-size:22px;font-weight:900;color:var(--pp)">${fNearFinish}</div></div>
+${GS.sf!=='A'?`<div onclick="GS.sf='A';renderOps()" style="cursor:pointer;padding:4px 8px;border-radius:7px;display:flex;align-items:center;font-size:10px;color:var(--rd);font-weight:700;border:1px solid var(--rd);background:var(--rdBg)" title="Clear filter">✕</div>`:''}
+</div>
+<div style="border-left:2px solid var(--c3);padding-left:12px;font-size:10px;color:var(--t2);line-height:2">
+<div>📈 Rate: <b class="mono" style="color:var(--ac);font-size:12px">${filteredRate}/wk</b></div>
+<div>⏱️ ETC: <b class="mono" style="color:var(--yl);font-size:12px">${filteredRemWeeks<999?filteredRemWeeks+'w':'∞'}</b></div>
+<div>🏁 Near HO: <b class="mono" style="color:var(--gn);font-size:12px">+${fNear}</b></div>
+</div>
+${selAct&&selAct.su.length>1?`<div style="border-left:2px solid var(--c3);padding-left:12px;min-width:180px">
+<div style="font-size:9px;font-weight:700;color:var(--t1);margin-bottom:4px">${selAct.ic} ${selAct.n} — Stage Flow</div>${funnelHTML}</div>`:''}
+<div style="border-left:2px solid var(--c3);padding-left:12px;min-width:100px">
+<div style="font-size:9px;font-weight:700;color:var(--rd);margin-bottom:4px">⚠️ Need Attention</div>
+${w3HTML||'<div style="font-size:9px;color:var(--gn)">All good ✅</div>'}
+</div>
+<div style="border-left:2px solid var(--c3);padding-left:12px;min-width:70px">
+<div style="font-size:9px;font-weight:700;color:var(--t1);margin-bottom:4px">📊 Distribution</div>
+<div style="display:flex;gap:2px;height:30px;align-items:end">${dist.map((d2,i)=>{const h=fv.length?Math.max(4,d2/fv.length*30):4;const c=i===0?'var(--rd)':i<=2?'var(--yl)':'var(--gn)';return`<div title="${['0%','1-25%','26-50%','51-75%','76-99%'][i]}: ${d2}" style="flex:1;height:${h}px;background:${c};border-radius:2px;opacity:.6"></div>`}).join("")}</div>
+</div>
+</div>
+${progBar}
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+<div style="flex:1;min-width:100px;background:var(--c2);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="font-size:16px">📅</div>
+<div><div style="font-size:8px;color:var(--t3);font-weight:600">${fcLabel.toUpperCase()}</div><div class="mono" style="font-size:14px;font-weight:900;color:${fOnTrack?'var(--gn)':'var(--rd)'}">${fmtD(fFcDate)}</div><div style="font-size:7px;color:var(--t3)">${selRemaining} remaining · ${filteredRate}/wk</div></div>
+<div style="margin-left:auto"><span class="rb ${fOnTrack?'rb-l':'rb-h'}">${fOnTrack?'ON TRACK':'AT RISK'}</span></div>
+</div>
+<div style="flex:1;min-width:100px;background:var(--c2);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="font-size:16px">🎯</div>
+<div><div style="font-size:8px;color:var(--t3);font-weight:600">READINESS SCORE</div><div class="mono" style="font-size:14px;font-weight:900;color:${fReadiness>=70?'var(--gn)':fReadiness>=40?'var(--yl)':'var(--rd)'}">${fReadiness}%</div></div>
+<div style="flex:1;height:6px;background:var(--c3);border-radius:3px;overflow:hidden;max-width:60px"><div style="height:100%;width:${fReadiness}%;background:${fReadiness>=70?'var(--gn)':fReadiness>=40?'var(--yl)':'var(--rd)'};border-radius:3px"></div></div>
+</div>
+<div style="flex:1;min-width:80px;background:var(--c2);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="font-size:16px">🔗</div>
+<div><div style="font-size:8px;color:var(--t3);font-weight:600">CONSTRAINTS</div><div class="mono" style="font-size:14px;font-weight:900;color:${fCons>0?'var(--rd)':'var(--gn)'}">${fCons}</div></div>
+<div style="font-size:8px;color:var(--t3)">open</div>
+</div>
+<div style="flex:1;min-width:80px;background:var(--c2);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="font-size:16px">🔧</div>
+<div><div style="font-size:8px;color:var(--t3);font-weight:600">BOTTLENECK</div><div style="font-size:12px;font-weight:800;color:var(--rd)">${bnName}</div></div>
+<div class="mono" style="font-size:10px;color:var(--t3)">${Math.round(bnPct)}%</div>
+</div>
+<div style="flex:1;min-width:80px;background:var(--c2);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="font-size:16px">📈</div>
+<div><div style="font-size:8px;color:var(--t3);font-weight:600">TREND</div>${sparkSVG(histSpk,50,18,fReadiness>=50?'#1a8a5c':'#c43322')}</div>
+<div style="font-size:8px;color:var(--t3)">${histSpk.length?histSpk[histSpk.length-1]+'%':'—'}</div>
+</div>
+</div>
+</div>`;
+
+// ===== VILLA TILES (Enhanced tooltips with smart positioning) =====
+const grps={};fv.forEach(v=>{const k=v.cm+v.z;if(!grps[k])grps[k]={cm:v.cm,z:v.z,vs:[]};grps[k].vs.push(v)});
+const sg=Object.values(grps).sort((a,b)=>a.cm===b.cm?a.z-b.z:a.cm==="M"?-1:1);
+let gH="";sg.forEach(g=>{let ti="";const len=g.vs.length;
+g.vs.forEach((v,vi)=>{
+  const val=v.a[ai],dn=val>=0.9,wp2=val>0&&val<0.9,cls=dn?"d":wp2?"w":"n";
+  const st=dn?`<div style="font-size:7px;color:var(--gn)">✓</div>`:wp2?`<div style="font-size:7px;color:var(--yl)">${Math.round(val*100)}%</div>`:`<div style="font-size:7px;color:var(--rd)">—</div>`;
+  const tt=villaTooltipV6(v,ai);
+  // Smart tooltip position: left-align for first 3, right-align for last 3, center for middle
+  const tpCls=vi<3?"tp-l":(vi>=len-3?"tp-r":"tp-c");
+  ti+=`<div class="vt ${cls}"><div class="vi">${v.id}</div>${st}<div class="tp ${tpCls}">${tt}</div></div>`;
+});
+gH+=`<div style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><div style="width:6px;height:6px;border-radius:2px;background:${CC[g.cm]}"></div><span style="font-size:11px;font-weight:700;color:${CC[g.cm]}">${CN[g.cm]}</span><span style="font-size:10px;color:var(--t3);background:var(--c2);padding:1px 6px;border-radius:4px">Z${g.z}</span><span style="font-size:9px;color:var(--t3)">(${g.vs.length})</span></div><div class="vg">${ti}</div></div>`});
+
+const sfLabels={A:"All",D:"✅ Done",W:"🔄 WIP",N:"⭕ Not Started",H:"🏁 HO Ready",F:"⏳ Near Finish"};
+const sfBadge=GS.sf!=="A"?`<span style="font-size:9px;padding:3px 8px;border-radius:5px;background:var(--acBg);color:var(--ac);font-weight:700;border:1px solid var(--ac);margin-left:4px">${sfLabels[GS.sf]} · ${fv.length} villas <span onclick="GS.sf='A';renderOps()" style="cursor:pointer;color:var(--rd);margin-left:4px">✕</span></span>`:'';
+document.getElementById("p_ops").innerHTML=`<div class="filters"><span style="font-size:8px;color:var(--t3)">COM</span>${["A","M","G"].map(c=>`<div class="fb ${GS.cf===c?'on':''}" onclick="GS.cf='${c}';GS.zf='A';GS.sf='A';renderOps()">${c==="A"?"All":CN[c]}</div>`).join("")}<span style="font-size:8px;color:var(--t3);margin-left:3px">ZONE</span>${"A1234".split("").map(z=>`<div class="fb ${GS.zf===z?'on':''}" onclick="GS.zf='${z}';GS.sf='A';renderOps()">${z==="A"?"All":"Z"+z}</div>`).join("")}<input class="si" placeholder="Villa..." value="${GS.q}" oninput="GS.q=this.value;renderOps()">${sfBadge}</div>
+<div style="display:grid;grid-template-columns:auto 1fr;gap:10px;margin-bottom:8px;align-items:start">
+<div>${sel}</div>
+${miniDash}
+</div>
+${fv.length?gH:'<div style="text-align:center;padding:12px;color:var(--t3)">No match</div>'}`;
+}
+
+// 12. COMPARE
+function renderCompare(){const snaps=D.snaps||[];if(snaps.length<2){document.getElementById("p_compare").innerHTML=`<div class="cd" style="padding:24px;text-align:center"><div style="font-size:30px">📸</div><div style="font-size:13px;font-weight:700;color:var(--t1)">Need 2+ Snapshots</div><div style="font-size:10px;color:var(--t3)">You have ${snaps.length}. Use 💾 to save.</div></div>`;return}
+const s1=snaps[snaps.length-2],s2=snaps[snaps.length-1];const v1=pr(s1.raw),v2=pr(s2.raw);const wp1=Math.round(wop(v1)*100),wp2=Math.round(wop(v2)*100);const an1=analyze(v1),an2=analyze(v2);
+let cHTML="";an2.forEach((d2,i)=>{const d1=an1[i];const pd=((d2.pct-d1.pct)*100).toFixed(1);const dd=d2.s.d-d1.s.d;cHTML+=`<tr><td style="font-weight:700">${d2.ic} ${d2.n}</td><td class="mono">${(d1.pct*100).toFixed(0)}%</td><td class="mono">${(d2.pct*100).toFixed(0)}%</td><td class="mono" style="color:${+pd>0?'var(--gn)':'var(--rd)'}">+${pd}%</td><td class="mono" style="color:var(--gn)">${dd>0?'+':''}${dd}</td><td class="mono">${d1.risk}→${d2.risk}</td></tr>`});
+document.getElementById("p_compare").innerHTML=`<div class="cd" style="margin-bottom:8px;padding:10px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:8px;color:var(--t3)">COMPARING</div><div style="font-size:12px;font-weight:700;color:var(--t1)">${s1.date} → ${s2.date}</div></div><div style="display:flex;gap:10px"><div class="mono" style="font-size:18px;font-weight:900;color:var(--t3)">${wp1}%</div><div style="font-size:16px;color:var(--t3)">→</div><div class="mono" style="font-size:18px;font-weight:900;color:var(--gn)">${wp2}%</div><div class="mono" style="font-size:18px;font-weight:900;color:var(--gn)">+${wp2-wp1}%</div></div></div></div>
+<div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Package</th><th>Before</th><th>After</th><th>Δ%</th><th>Δ Done</th><th>Risk</th></tr></thead><tbody>${cHTML}</tbody></table></div>`;}
+
+// ============================================================
+// RENDER + STORAGE + INIT
+// ============================================================
+// 13. AUDIT TRAIL
+function renderAudit(){
+  const audit=(D.audit||[]).slice().reverse();
+  if(!audit.length){document.getElementById("p_audit").innerHTML='<div class="cd" style="padding:24px;text-align:center"><div style="font-size:30px">📜</div><div style="font-size:13px;font-weight:700;color:var(--t1)">No Audit Records</div><div style="font-size:10px;color:var(--t3)">Actions will be logged as you use the tool.</div></div>';return}
+  // Summary
+  const uploads=audit.filter(a=>a.action==='FILE_UPLOAD').length;
+  const overwrites=audit.filter(a=>a.action==='OVERWRITE'||a.action==='REGRESSION_OVERWRITE').length;
+  const regressions=audit.filter(a=>a.action==='REGRESSION_OVERWRITE').length;
+  let sumHTML=`<div class="grid g4" style="margin-bottom:8px">
+    <div class="cd kpi"><div class="lbl">Total Events</div><div class="val" style="color:var(--ac)">${audit.length}</div></div>
+    <div class="cd kpi"><div class="lbl">Uploads</div><div class="val" style="color:var(--gn)">${uploads}</div></div>
+    <div class="cd kpi"><div class="lbl">Overwrites</div><div class="val" style="color:var(--yl)">${overwrites}</div></div>
+    <div class="cd kpi"><div class="lbl">Regressions</div><div class="val" style="color:var(--rd)">${regressions}</div></div>
+  </div>`;
+  // GOV Status
+  let govHTML=`<div class="cd gl-b" style="margin-bottom:8px;padding:10px">
+    <div style="font-size:12px;font-weight:800;color:var(--t1)">🔒 Date Governance Status</div>
+    <div style="display:flex;gap:12px;margin-top:4px;font-size:10px">
+      <span>Data Date: <b class="mono" style="color:var(--ac)">${GOV.iso()}</b></span>
+      <span>Display: <b style="color:var(--t1)">${D.date}</b></span>
+      <span>Days Left: <b class="mono" style="color:var(--yl)">${DLEFT}</b></span>
+      <span>Weeks Elapsed: <b class="mono" style="color:var(--t2)">${WELAPSED}</b></span>
+      <span>Daily Records: <b class="mono" style="color:var(--gn)">${D.hist.daily?.length||0}</b></span>
+      <span>Snapshots: <b class="mono" style="color:var(--pp)">${D.snaps?.length||0}</b></span>
+    </div>
+  </div>`;
+  // Log table
+  let tHTML='';
+  audit.slice(0,50).forEach((a,i)=>{
+    const ac=a.action==='REGRESSION_OVERWRITE'?'rb-h':a.action==='OVERWRITE'?'rb-m':'rb-l';
+    const det=typeof a.details==='object'?JSON.stringify(a.details).slice(0,80):String(a.details||'');
+    tHTML+=`<tr><td class="mono" style="font-size:8px">${a.ts||'—'}</td><td><span class="rb ${ac}">${a.action}</span></td><td style="font-size:9px">${a.dataDate||'—'}</td><td style="font-size:8px;color:var(--t3);max-width:200px;overflow:hidden;text-overflow:ellipsis">${det}</td></tr>`;
+  });
+  document.getElementById("p_audit").innerHTML=`${govHTML}${sumHTML}
+    <div class="cd" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th><th>Action</th><th>Data Date</th><th>Details</th></tr></thead><tbody>${tHTML}</tbody></table></div>
+    <div style="margin-top:8px;text-align:right"><button class="abtn" onclick="if(confirm('Clear audit trail?')){D.audit=[];window.storage.set('ext_v6_audit','[]');renderAudit()}">🗑️ Clear Audit</button></div>`;
+}
+
+function render(){updateBanner();({exec:renderExec,forecast:renderForecast,handover:renderHandover,spc:renderSPC,balance:renderBalance,zones:renderZones,constraints:renderConstraints,actions:renderActions,daily:renderDaily,weekly:renderWeekly,ops:renderOps,compare:renderCompare,audit:renderAudit})[curTab]?.()}
+
+// Storage
+function makeDailyRec(vs,dt){const ad=ALL_SUBS.map(sub=>gs(vs,sub.ai).d);const iso=GOV.iso();if(!iso||iso==="undefined"){console.error('[makeDailyRec] GOV.iso() returned invalid:',iso);return null}return{date:dt,iso,raw:enc(vs),stats:{actDone:ad,overall:+(sop(vs)*100).toFixed(1)}}}
+function calcWeekRollup(recs,lbl){if(recs.length<2)return null;const f=recs[0],l=recs[recs.length-1];return{week:lbl,start:f.date,end:l.date,totalGain:l.stats.actDone.reduce((s,v,i)=>s+(v-(f.stats.actDone[i]||0)),0),overallDelta:+(l.stats.overall-f.stats.overall).toFixed(1),catGains:ACTS.map(a=>{const li2=a.ix[a.ix.length-1];return(l.stats.actDone[li2]||0)-(f.stats.actDone[li2]||0)})}}
+async function loadHist(){try{const r=await window.storage.get("ext_v6_hist");if(r?.value)D.hist=JSON.parse(r.value)}catch(e){}if(!D.hist)D.hist={daily:[],weekly:[]};try{const r=await window.storage.get("ext_v6");if(r?.value)D.snaps=JSON.parse(r.value)}catch(e){D.snaps=[]}try{const r=await window.storage.get("ext_v6_c");if(r?.value)D.constraints=JSON.parse(r.value)}catch(e){D.constraints=[]}try{const r=await window.storage.get("ext_v6_ppc");if(r?.value)D.ppc=JSON.parse(r.value)}catch(e){D.ppc=[]}try{const r=await window.storage.get("ext_v6_fca");if(r?.value)D.fcAccuracy=JSON.parse(r.value)}catch(e){D.fcAccuracy=[]}
+try{const r=await window.storage.get("ext_v6_audit");if(r?.value)D.audit=JSON.parse(r.value)}catch(e){D.audit=[]}}
+async function saveHist(){try{if(D.hist.daily.length>90)D.hist.daily=D.hist.daily.slice(-90);await window.storage.set("ext_v6_hist",JSON.stringify(D.hist))}catch(e){console.error('[saveHist]',e)}try{await window.storage.set("ext_v6_audit",JSON.stringify(D.audit||[]))}catch(e){}}
+async function saveCons(){try{await window.storage.set("ext_v6_c",JSON.stringify(D.constraints))}catch(e){}}
+async function savePPC2(){try{await window.storage.set("ext_v6_ppc",JSON.stringify(D.ppc))}catch(e){}}
+async function saveFcAcc(){try{await window.storage.set("ext_v6_fca",JSON.stringify(D.fcAccuracy))}catch(e){}}
+async function saveDailyRec(){
+  const rec=makeDailyRec(D.v,D.date);
+  if(!rec){console.error('[saveDailyRec] makeDailyRec returned null');return}
+  // Validate
+  const validation=GOV.validateRecord(rec);
+  if(!validation.valid){console.warn('[saveDailyRec] Validation issues:',validation.issues)}
+  // Duplicate/overwrite handling
+  const ei=GOV.findDuplicate(rec.iso);
+  if(ei>=0){
+    const existing=D.hist.daily[ei];
+    const regr=GOV.detectRegression(rec,existing);
+    if(regr){console.warn('[saveDailyRec] Regression detected:',regr);auditLog('REGRESSION_OVERWRITE',{iso:rec.iso,regressions:regr})}
+    else{auditLog('OVERWRITE',{iso:rec.iso,oldOverall:existing.stats.overall,newOverall:rec.stats.overall})}
+    D.hist.daily[ei]=rec;
+  }else{
+    D.hist.daily.push(rec);
+    auditLog('NEW_RECORD',{iso:rec.iso,overall:rec.stats.overall});
+  }
+  D.hist.daily.sort((a,b)=>a.iso.localeCompare(b.iso));
+  // Weekly rollup — based on DATA date (GOV), not browser date
+  const dataDate=GOV.now();
+  const dayOfWeek=dataDate.getDay()||7; // 1=Mon..7=Sun
+  // Trigger rollup if we have records spanning at least 5 days in the current ISO week
+  const weekStart=GOV.weekStart(dataDate);
+  const weekEnd=GOV.weekEnd(dataDate);
+  const wsISO=weekStart.toISOString().split('T')[0];
+  const weISO=weekEnd.toISOString().split('T')[0];
+  const weekRecs=D.hist.daily.filter(d=>d.iso>=wsISO&&d.iso<=weISO);
+  if(weekRecs.length>=2&&dayOfWeek>=5){
+    const wLabel=GOV.weekLabel(dataDate);
+    if(!D.hist.weekly.find(w=>w.week===wLabel)){
+      const ru=calcWeekRollup(weekRecs,wLabel);
+      if(ru){D.hist.weekly.push(ru);auditLog('WEEKLY_ROLLUP',{week:wLabel,records:weekRecs.length})}
+    }
+  }
+  await saveHist()
+}
+async function saveSnap(){
+  const snapISO=GOV.iso();
+  if(!snapISO){alert("❌ Cannot save — no valid date set. Upload a file first.");return}
+  // Check for existing snapshot on same date
+  const existingIdx=D.snaps.findIndex(s=>s.iso===snapISO);
+  if(existingIdx>=0){
+    if(!confirm("⚠️ Snapshot already exists for "+D.date+".\nOverwrite?")){return}
+    D.snaps[existingIdx]={date:D.date,iso:snapISO,raw:enc(D.v)};
+    auditLog('SNAP_OVERWRITE',{iso:snapISO});
+  }else{
+    D.snaps.push({date:D.date,iso:snapISO,raw:enc(D.v)});
+    auditLog('SNAP_NEW',{iso:snapISO});
+  }
+  D.snaps.sort((a,b)=>(a.iso||"").localeCompare(b.iso||""));
+  if(D.snaps.length>30){
+    const removed=D.snaps.length-30;
+    D.snaps=D.snaps.slice(-30);
+    auditLog('SNAP_TRIMMED',{removed});
+  }
+  try{await window.storage.set("ext_v6",JSON.stringify(D.snaps))}catch(e){console.error('[saveSnap] Storage error:',e)}
+  await saveDailyRec();
+  alert("✅ Saved: "+D.date+"\n📊 Records: "+D.hist.daily.length+" daily · "+D.snaps.length+" snapshots");
+  render()
+}
+
+// Constraints CRUD
+function addConstraintUI(){document.getElementById("cM").classList.remove("hide")}
+function hideConstraint(){document.getElementById("cM").classList.add("hide")}
+function saveConstraint(){D.constraints.push({villa:document.getElementById("c_villa").value||"ALL",pkg:document.getElementById("c_pkg").value,type:document.getElementById("c_type").value,desc:document.getElementById("c_desc").value,owner:document.getElementById("c_own").value,impact:+document.getElementById("c_impact").value||0,due:document.getElementById("c_due").value,identified:GOV.iso(),status:"Open"});saveCons();hideConstraint();render()}
+function resolveConstraint(i){D.constraints[i].status="Resolved";D.constraints[i].resolved=GOV.iso();saveCons();renderConstraints()}
+
+// PPC (Committee 4 #5)
+function showPPC(){const form=document.getElementById("ppcForm");let h="";ACTS.forEach(a=>{h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:90px;font-size:10px;font-weight:600">${a.ic} ${a.n}</div><input type="number" id="ppc_${a.n.replace(/\s/g,'')}" value="0" min="0" max="162" style="width:60px;padding:3px 6px;border:1px solid var(--bd);border-radius:4px;font-size:10px;font-family:monospace"></div>`});form.innerHTML=h;document.getElementById("ppcM").classList.remove("hide")}
+function hidePPC(){document.getElementById("ppcM").classList.add("hide")}
+function savePPCPlan(){const plan={};ACTS.forEach(a=>{plan[a.n]=+(document.getElementById("ppc_"+a.n.replace(/\s/g,''))?.value||0)});const week=GOV.weekLabel(GOV.now());D.ppc.push({week,plan,actual:{},date:GOV.iso()});savePPC2();hidePPC();auditLog('PPC_PLAN',{week});alert("✅ PPC plan saved for "+week);render()}
+
+// Upload + Validation
+function validateData(vs){const log=[];if(vs.length<160)log.push({t:"warn",m:`${vs.length} villas (expected 162)`});const ids=vs.map(v=>v.id);const dupes=ids.filter((id,i)=>ids.indexOf(id)!==i);if(dupes.length)log.push({t:"error",m:`Duplicates: ${[...new Set(dupes)].join(", ")}`});vs.forEach(v=>{ACTS.forEach(a=>{for(let i=1;i<a.ix.length;i++){if(v.a[a.ix[i]]>0.5&&v.a[a.ix[i-1]]<0.1)log.push({t:"warn",m:`${v.id}: ${a.n} sequence issue`})}})});return log}
+function showUpload(){document.getElementById("uM").classList.remove("hide")}
+function hideUpload(){document.getElementById("uM").classList.add("hide");document.getElementById("valLog").style.display="none"}
+function handleFile(f){if(!f)return;
+// === DATE EXTRACTION: from filename first, then lastModified ===
+function extractFileDate(file){
+  const fname=file.name||"";
+  // Try patterns: DD-MM-YYYY, DD_MM_YYYY, YYYY-MM-DD, DD.MM.YYYY
+  const patterns=[
+    /(\d{1,2})-(\d{1,2})-(\d{4})/,    // 04-04-2026
+    /(\d{1,2})_(\d{1,2})_(\d{4})/,     // 04_04_2026
+    /(\d{1,2})\.(\d{1,2})\.(\d{4})/,   // 04.04.2026
+  ];
+  for(const p of patterns){
+    const m=fname.match(p);
+    if(m){const d=+m[1],mo=+m[2],y=+m[3];if(y>=2020&&y<=2030&&mo>=1&&mo<=12&&d>=1&&d<=31)return new Date(y,mo-1,d)}
+  }
+  // Try YYYY-MM-DD
+  const isoM=fname.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(isoM){const y=+isoM[1],mo=+isoM[2],d=+isoM[3];if(y>=2020)return new Date(y,mo-1,d)}
+  // Fallback: file lastModified
+  if(file.lastModified)return new Date(file.lastModified);
+  // LAST RESORT: prompt user for date since we can't determine it
+  const userDate=prompt("⚠️ Could not detect file date from filename.\nPlease enter date (YYYY-MM-DD):",GOV.iso());
+  if(userDate&&/^\d{4}-\d{2}-\d{2}$/.test(userDate)){const pd=new Date(userDate+"T12:00:00");if(!isNaN(pd.getTime()))return pd}
+  console.warn("[extractFileDate] All date extraction methods failed, using GOV data date as fallback");
+  return GOV.now();
+}
+const fileDate=extractFileDate(f);
+const fileDateISO=fileDate.toISOString().split("T")[0];
+const fileDateStr=fileDate.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+
+const r=new FileReader();r.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:"array"});const ws=wb.Sheets["Daily Progress"];if(!ws){alert("'Daily Progress' not found!");return}const j=XLSX.utils.sheet_to_json(ws,{header:1});const vs=[];let cc="",cz="";for(let r2=3;r2<j.length;r2++){const row=j[r2];if(!row||!row[3])continue;const vid=String(row[3]).trim();if(!vid)continue;if(row[0])cc=String(row[0]);if(row[1])cz=String(row[1]);const cm=(cc.includes("Middle")||vid.startsWith("M"))?"M":"G";let zn=0;const zp=cz.split(" ");if(zp.length>=2){const n2=parseInt(zp[zp.length-1]);if(!isNaN(n2))zn=n2}const a=[];for(let c2=4;c2<=22;c2++){const v=row[c2];a.push(v==null||v===""||isNaN(+v)?0:Math.min(1,Math.max(0,+v)))}vs.push({id:vid,cm,z:zn,a})}
+const vl=validateData(vs);if(vl.length){const ld=document.getElementById("valLog");ld.style.display="block";ld.innerHTML=vl.map(l=>`<div style="color:${l.t==='error'?'var(--rd)':'var(--yl)'}">${l.t==='error'?'❌':'⚠️'} ${l.m}</div>`).join("")}
+if(vs.length){D.v=vs;D.date=fileDateStr;D._dateISO=fileDateISO;BASELINE_RATE=vs.length/PROJECT_WEEKS;updateDates(fileDateISO);auditLog('FILE_UPLOAD',{file:f.name||'unknown',villas:vs.length,date:fileDateISO});saveDailyRec();hideUpload();updHdr();render();alert("✅ "+vs.length+" villas loaded!\n📅 Date: "+fileDateStr+"\n📊 Rate source: "+(computeLiveRates()?"Live from "+D.hist.daily.length+" records":"Historical (upload more files for live rates)"))}}catch(err){alert("Error: "+err.message)}};r.readAsArrayBuffer(f)}
+const dz=document.getElementById("dz");dz.ondragover=e=>{e.preventDefault();dz.style.borderColor="var(--ac)"};dz.ondragleave=()=>{dz.style.borderColor=""};dz.ondrop=e=>{e.preventDefault();dz.style.borderColor="";if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0])};
+
+// Dark/Light Toggle (Committee 3 #10)
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==="dark"?"":"dark"}
+
+function updHdr(){document.getElementById("dtC").textContent=D.date;document.getElementById("vlC").textContent=D.v.length}
+async function init(){
+  D.v=pr(RAW);await loadHist();
+  // FIX A: Use latest date from daily records if available
+  const daily=D.hist.daily||[];
+  if(daily.length>0){
+    // NON-DESTRUCTIVE sort — spread copy first
+    const sorted=[...daily].sort((a,b)=>b.iso.localeCompare(a.iso));
+    const latest=sorted[0];
+    if(latest&&latest.iso){
+      D._dateISO=latest.iso;
+      D.date=latest.date;
+      if(latest.raw)D.v=pr(latest.raw);
+    }
+  }
+  updateDates(D._dateISO);
+  BASELINE_RATE=D.v.length/PROJECT_WEEKS;
+  // Load audit trail
+  try{const r=await window.storage.get("ext_v6_audit");if(r?.value)D.audit=JSON.parse(r.value)}catch(e){D.audit=[]}
+  initUI();updHdr();render();
+  auditLog('INIT',{records:daily.length,snaps:D.snaps.length,date:D.date});
+}
+init();
+</script></body></html>
